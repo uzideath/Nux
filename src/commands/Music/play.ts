@@ -3,6 +3,7 @@ import { Command } from '@sapphire/framework';
 import { KazagumoPlayer, KazagumoSearchResult } from 'kazagumo';
 import { AlyaEmbed } from '../../utils/embed';
 import config from '../../config';
+import { Colors } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
     description: 'Play a song from search'
@@ -59,14 +60,17 @@ export class UserCommand extends Command {
             for (let track of result.tracks) {
                 player.queue.add(track);
             }
-            await this.reply(interaction, `Added playlist **${result.playlistName}** to the queue.`);
+            const embed = new AlyaEmbed(`Added playlist **${result.playlistName}** to the queue.`)
+                .setColor(Colors.White)
+                .setAuthor({ name: interaction.user.displayName, iconURL: config.Icons.Check })
+            await interaction.reply({ embeds: [embed] });
         } else {
             const track = result.tracks[0];
             player.queue.add(track);
             const trackUrl = track.uri;
             const embed = new AlyaEmbed(`Added [**${track.title}** by **${track.author}**](${trackUrl}) to the queue.`)
                 .setAuthor({ name: interaction.user.displayName, iconURL: config.Icons.Check })
-                
+
             await interaction.reply({ embeds: [embed] });
         }
 

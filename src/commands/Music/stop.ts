@@ -1,5 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
+import { EmbedBuilder } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
     description: 'Stop the music and leave the voice channel'
@@ -21,10 +22,19 @@ export class StopCommand extends Command {
         }
 
         player.destroy();
-        return this.reply(interaction, 'Music stopped and bot disconnected from the voice channel.');
+
+        const embed = new EmbedBuilder()
+            .setDescription('Music stopped and bot disconnected from the voice channel.')
+            .setColor('#FF0000');
+
+        return interaction.reply({ embeds: [embed], ephemeral: false });
     }
 
     private async reply(interaction: Command.ChatInputCommandInteraction, content: string) {
-        await interaction.reply({ content: content, ephemeral: true });
+        const embed = new EmbedBuilder()
+            .setDescription(content)
+            .setColor('#FF0000');
+
+        await interaction.reply({ embeds: [embed], ephemeral: false });
     }
 }

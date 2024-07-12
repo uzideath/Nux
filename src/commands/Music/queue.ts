@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { Command } from '@sapphire/framework';
-import { EmbedBuilder, ButtonStyle, ComponentType } from 'discord.js';
+import { EmbedBuilder, ButtonStyle, ComponentType, Colors } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
     description: 'Show the current song queue'
@@ -19,17 +19,22 @@ export class QueueCommand extends Command {
         const player = this.container.kazagumo.players.get(interaction.guildId!);
 
         if (!player) {
-            return this.reply(interaction, 'There is no active player in this server.');
+            return await interaction.reply({
+                content: 'There is no active player in this server.',
+                ephemeral: true
+            });
         }
 
         if (player.queue.length === 0) {
-            return this.reply(interaction, 'The queue is currently empty.');
+            return await interaction.reply({
+                content: 'The queue is currently empty.',
+                ephemeral: true
+            })
         }
 
         const paginatedMessage = new PaginatedMessage({
             template: new EmbedBuilder()
-                .setColor('#FF0000')
-                .setFooter({ text: 'Page footer' })
+                .setColor(Colors.White)
         });
 
         const tracks = player.queue;
@@ -103,10 +108,6 @@ export class QueueCommand extends Command {
             }
         ]);
 
-        await paginatedMessage.run(interaction, interaction.user);
-    }
-
-    private async reply(interaction: Command.ChatInputCommandInteraction, content: string) {
-        await interaction.reply({ content: content });
+        return await paginatedMessage.run(interaction, interaction.user);
     }
 }

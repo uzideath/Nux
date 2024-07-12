@@ -13,4 +13,8 @@ export default {
         Playing: 'https://cdn.darrennathanael.com/icons/spinning_disk.gif',
         Loading: ''
     },
+    emojis: {
+        check: '<:accepted:1083594549575823430>',
+        warn: '<:cattowarn:1109936311399350433>'
+    }
 };

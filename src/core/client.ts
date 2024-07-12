@@ -1,10 +1,13 @@
 import { SapphireClient, LogLevel, container } from "@sapphire/framework";
+import { getRootData } from "@sapphire/pieces";
 import { ActivityType, GatewayIntentBits, Partials } from "discord.js";
 import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors } from 'shoukaku';
 import config from "../config";
+import { join } from "path";
 
 export class Client extends SapphireClient {
+    private rootData = getRootData();
     constructor() {
         super({
             defaultPrefix: '!',
@@ -38,6 +41,7 @@ export class Client extends SapphireClient {
             },
             loadMessageCommandListeners: true
         });
+        this.stores.get('listeners').registerPath(join(this.rootData.root, 'events'));
     }
 
     public override login(token?: string) {
