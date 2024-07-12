@@ -103,6 +103,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/busboy@npm:^2.0.0":
+  version: 2.1.1
+  resolution: "@fastify/busboy@npm:2.1.1"
+  checksum: 10c0/6f8027a8cba7f8f7b736718b013f5a38c0476eea67034c94a0d3c375e2b114366ad4419e6a6fa7ffc2ef9c6d3e0435d76dd584a7a1cbac23962fda7650b579e3
+  languageName: node
+  linkType: hard
+
 "@favware/colorette-spinner@npm:^1.0.1":
   version: 1.0.1
   resolution: "@favware/colorette-spinner@npm:1.0.1"
@@ -502,6 +509,7 @@ __metadata:
     colorette: "npm:^2.0.20"
     discord.js: "npm:^14.14.1"
     kazagumo: "npm:^3.0.5"
+    kazagumo-spotify: "npm:^2.1.0"
     npm-run-all2: "npm:^6.1.1"
     prettier: "npm:^3.2.4"
     tsc-watch: "npm:^6.0.4"
@@ -1184,6 +1192,15 @@ __metadata:
   version: 3.0.2
   resolution: "json-parse-even-better-errors@npm:3.0.2"
   checksum: 10c0/147f12b005768abe9fab78d2521ce2b7e1381a118413d634a40e6d907d7d10f5e9a05e47141e96d6853af7cc36d2c834d0a014251be48791e037ff2f13d2b94b
+  languageName: node
+  linkType: hard
+
+"kazagumo-spotify@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "kazagumo-spotify@npm:2.1.0"
+  dependencies:
+    undici: "npm:6.6.1"
+  checksum: 10c0/3afdb336fd0ec87905ba0214b926bc808669235fba68716d10a960833b1974695adb187df6491b33ebc8cf09eb1be1aaa3f8141dfd210838ff5b0500c22b318b
   languageName: node
   linkType: hard
 
@@ -2094,6 +2111,15 @@ __metadata:
   version: 6.13.0
   resolution: "undici@npm:6.13.0"
   checksum: 10c0/b1b0456e7d4e87fd4f71a2a0716d8ea826f024fbcf16b7c6185194ca138cb822c20db509ed18c837fffcd9ffc3d74004ad6f950ebc895ff81ebb5ca6bf001cb2
+  languageName: node
+  linkType: hard
+
+"undici@npm:6.6.1":
+  version: 6.6.1
+  resolution: "undici@npm:6.6.1"
+  dependencies:
+    "@fastify/busboy": "npm:^2.0.0"
+  checksum: 10c0/ac90f67fa5132685c15b2d902a28d88951e25caa40e6678d96b872dd6ca2a09bf51de8d8ea0df06645bc6542b9f99d3d17c944147cd2c2d957556343d57f7c83
   languageName: node
   linkType: hard
 

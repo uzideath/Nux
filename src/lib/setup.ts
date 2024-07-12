@@ -30,5 +30,7 @@ declare module '@skyra/env-utilities' {
 		LAVALINK_NAME: string;
 		LAVALINK_URL: string;
 		LAVALINK_AUTH: string;
+		SPOTIFY_CLIENT_ID: string;
+		SPOTIFY_CLIENT_SECRET: string;
 	}
 }

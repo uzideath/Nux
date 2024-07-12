@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
 import { KazagumoPlayer, KazagumoSearchResult } from 'kazagumo';
+import { AlyaEmbed } from '../../utils/embed';
 
 @ApplyOptions<Command.Options>({
     description: 'Play a song from search'
@@ -62,15 +62,8 @@ export class UserCommand extends Command {
         } else {
             const track = result.tracks[0];
             player.queue.add(track);
-            const trackUrl = track.uri;  // Assuming track.uri contains the URL to the track
-            const embed = new EmbedBuilder()
-                .setTitle(track.title)
-                .setURL(trackUrl!)
-                .setAuthor({ name: track.author!, iconURL: interaction.user.displayAvatarURL() })
-                .setThumbnail(`https://img.youtube.com/vi/${track.identifier}/hqdefault.jpg`)
-                .setDescription(`Added [**${track.title}** by **${track.author}**](${trackUrl}) to the queue.`)
-                .setColor('#FF0000');
-
+            const trackUrl = track.uri;
+            const embed = new AlyaEmbed(`Added [**${track.title}** by **${track.author}**](${trackUrl}) to the queue.`)
             await interaction.reply({ embeds: [embed] });
         }
 
