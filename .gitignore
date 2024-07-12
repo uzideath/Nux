@@ -14,7 +14,7 @@ node_modules/
 dist/
 
 # Ignore the config file (contains sensitive information such as tokens)
-config.ts
+.env
 
 # Ignore heapsnapshot and log files
 *.heapsnapshot
