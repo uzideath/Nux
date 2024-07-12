@@ -10,7 +10,6 @@ Alya is a powerful Discord Music Application, based on Lavalink with [Kazagumo W
 ![GitHub contributors](https://img.shields.io/github/contributors/arestosora/Alya) 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/arestosora/Alya) 
 ![GitHub last commit](https://img.shields.io/github/last-commit/arestosora/Alya) 
-![NPM](https://img.shields.io/npm/l/arestosora)
 
 <p>
   <img src=".github/assets/image.png" alt="Alya sometimes hides her feelings in russian.">
