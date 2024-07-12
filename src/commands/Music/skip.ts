@@ -1,5 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
+import config from '../../config';
 
 @ApplyOptions<Command.Options>({
     description: 'Skip the current song and play the next one in the queue'
@@ -24,7 +25,7 @@ export class SkipCommand extends Command {
             return this.reply(interaction, 'There are no more songs in the queue.');
         }
 
-        await this.reply(interaction, 'Skipped the current song.');
+        await this.reply(interaction, config.emojis.check);
         player.skip();
     }
 

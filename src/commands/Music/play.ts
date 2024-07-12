@@ -3,6 +3,7 @@ import { Command } from '@sapphire/framework';
 import { KazagumoPlayer, KazagumoSearchResult } from 'kazagumo';
 import { AlyaEmbed } from '../../utils/embed';
 import { Colors } from 'discord.js';
+import config from '../../config';
 
 @ApplyOptions<Command.Options>({
     description: 'Play a song or playlist from search'
@@ -32,26 +33,11 @@ export class UserCommand extends Command {
             return interaction.editReply('You must be in a voice channel to use this command.');
         }
 
-        let author = '';
-        let image = '';
-
-        if (query.includes('youtube.com') || query.includes('youtu.be')) {
-            author = 'YouTube';
-            image = 'https://cdn3.emoji.gg/emojis/17807-youtube.png'; // Reemplaza esto con la URL de la imagen de YouTube
-        } else if (query.includes('spotify.com')) {
-   
-            author = 'Spotify';
-            image = 'https://cdn3.emoji.gg/emojis/2320-spotify.png'; // Reemplaza esto con la URL de la imagen de Spotify
-        }
+        const { author, image } = this.getSourceInfo(query);
 
         let player: KazagumoPlayer;
         try {
-            player = await this.container.kazagumo.createPlayer({
-                guildId: interaction.guildId!,
-                textId: interaction.channel?.id!,
-                voiceId: member.voice.channelId!,
-                volume: 100
-            });
+            player = await this.createPlayer(interaction.guildId!, interaction.channel?.id!, member.voice.channelId!);
         } catch (error) {
             console.error('Error creating the player:', error);
             return interaction.editReply('There was an error creating the player.');
@@ -59,7 +45,7 @@ export class UserCommand extends Command {
 
         let result: KazagumoSearchResult;
         try {
-            result = await this.container.kazagumo.search(query, { requester: interaction.user });
+            result = await this.searchTrack(query, interaction.user.displayName);
         } catch (error) {
             console.error('Error searching for the song:', error);
             return interaction.editReply('There was an error searching for the song.');
@@ -69,30 +55,60 @@ export class UserCommand extends Command {
             return interaction.editReply('No results were found.');
         }
 
+        return await this.handleSearchResult(result, player, author, image, interaction);
+    }
+
+    private getSourceInfo(query: string) {
+        if (query.includes('youtube.com') || query.includes('youtu.be')) {
+            return { author: 'YouTube', image: config.Icons.Youtube };
+        } else if (query.includes('spotify.com')) {
+            return { author: 'Spotify', image: config.Icons.Spotify };
+        }
+        return { author: 'Unknown', image: '' };
+    }
+
+    private async createPlayer(guildId: string, textId: string | undefined, voiceId: string) {
+        return await this.container.kazagumo.createPlayer({
+            guildId,
+            textId: textId!,
+            voiceId,
+            volume: 100,
+            deaf: true
+        });
+    }
+
+    private async searchTrack(query: string, requester: string) {
+        return await this.container.kazagumo.search(query, { requester });
+    }
+
+    private async handleSearchResult(result: KazagumoSearchResult, player: KazagumoPlayer, author: string, image: string, interaction: Command.ChatInputCommandInteraction) {
         if (result.type === 'PLAYLIST') {
-            for (let track of result.tracks) {
-                player.queue.add(track);
-            }
-            const embed = new AlyaEmbed(`Added playlist **${result.playlistName}** to the queue.`)
-                .setColor(Colors.White)
-                .setAuthor({ name: author, iconURL: image })
+            result.tracks.forEach(track => player.queue.add(track));
+            const embed = this.createPlaylistEmbed(result.playlistName!, author, image);
             await interaction.editReply({ content: '', embeds: [embed] });
         } else {
             const track = result.tracks[0];
             player.queue.add(track);
-            const trackUrl = track.uri;
-            const embed = new AlyaEmbed(`Added [**${track.title}** by **${track.author}**](${trackUrl}) to the queue.`)
-                .setAuthor({ name: author, iconURL: image });
-            
-            return await interaction.editReply({ content: '', embeds: [embed] });
+            const embed = this.createTrackEmbed(track.title, track.author!, track.uri!, author, image);
+            await interaction.editReply({ content: '', embeds: [embed] });
         }
 
         if (!player.playing && !player.paused) {
             player.play().catch(error => {
                 console.error('Error playing the track:', error);
-                return interaction.editReply('There was an error playing the track.');
+                interaction.editReply('There was an error playing the track.');
             });
         }
-        return;
+    }
+
+    private createPlaylistEmbed(playlistName: string, author: string, image: string) {
+        return new AlyaEmbed(`Added playlist **${playlistName}** to the queue.`)
+            .setColor(Colors.White)
+            .setAuthor({ name: author, iconURL: image });
+    }
+
+    private createTrackEmbed(title: string, trackAuthor: string, url: string, author: string, image: string) {
+        return new AlyaEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`)
+            .setAuthor({ name: author, iconURL: image });
     }
 }

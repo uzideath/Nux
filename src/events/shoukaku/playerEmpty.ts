@@ -17,7 +17,10 @@ export class UserEvent extends Listener {
                     player.data.set('message', message);
                 });
             }
-            player.destroy();
+
+            setTimeout(() => {
+                player.destroy();
+            }, config.Bot.inactivity);
         });
     }
 }
