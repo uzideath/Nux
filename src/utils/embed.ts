@@ -1,12 +1,13 @@
-import { EmbedBuilder } from 'discord.js';
+import { Colors, EmbedBuilder } from 'discord.js';
+import config from '../config';
 
 export class AlyaEmbed extends EmbedBuilder {
     constructor(description: string) {
         super();
-        this.setColor('#FF0000')
-            .setAuthor({ name: 'Now playing...', iconURL: 'https://cdn.darrennathanael.com/icons/spinning_disk.gif' })
+        this.setColor(Colors.White)
+            .setAuthor({ name: 'Now playing...', iconURL: config.Icons.Playing })
             .setDescription(description)
-            .setFooter({ text: 'Alya', iconURL: 'https://i.pinimg.com/736x/e2/48/cf/e248cffd8b8c0fc9542d9ac71179b9fe.jpg' })
+            .setFooter({ text: 'Alya', iconURL: config.Icons.Bot })
             .setTimestamp();
     }
 }
