@@ -1,0 +1,10 @@
+services:
+  lavalink:
+    image: fredboat/lavalink:latest
+    container_name: lavalink
+    ports:
+      - "2333:2333"
+    volumes:
+      - ./application.yml:/opt/Lavalink/application.yml
+    environment:
+      - JAVA_OPTS=-Xmx4G -Xms4G
