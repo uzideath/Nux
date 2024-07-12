@@ -32,7 +32,7 @@ export class Client extends SapphireClient {
     }
 
     public override login(token?: string) {
-        container.Kazagumo = new Kazagumo({
+        container.kazagumo = new Kazagumo({
             defaultSearchEngine: "youtube",
             send: (guildId, payload) => {
                 const guild = this.guilds.cache.get(guildId);
