@@ -33,7 +33,7 @@ export class UserCommand extends Command {
             return interaction.editReply('You must be in a voice channel to use this command.');
         }
 
-        const { author, image } = this.getSourceInfo(query);
+        const { author, image, engine } = this.getSourceInfo(query);
 
         let player: KazagumoPlayer;
         try {
@@ -45,7 +45,7 @@ export class UserCommand extends Command {
 
         let result: KazagumoSearchResult;
         try {
-            result = await this.searchTrack(query, interaction.user.displayName);
+            result = await this.searchTrack(query, interaction.user.displayName, engine);
         } catch (error) {
             console.error('Error searching for the song:', error);
             return interaction.editReply('There was an error searching for the song.');
@@ -60,11 +60,11 @@ export class UserCommand extends Command {
 
     private getSourceInfo(query: string) {
         if (query.includes('youtube.com') || query.includes('youtu.be')) {
-            return { author: 'YouTube', image: config.Icons.Youtube };
+            return { author: 'YouTube', image: config.Icons.Youtube, engine: 'youtube' };
         } else if (query.includes('spotify.com')) {
-            return { author: 'Spotify', image: config.Icons.Spotify };
+            return { author: 'Spotify', image: config.Icons.Spotify, engine: 'spotify' };
         }
-        return { author: 'Unknown', image: '' };
+        return { author: 'Unknown', image: '', engine: 'default' };
     }
 
     private async createPlayer(guildId: string, textId: string | undefined, voiceId: string) {
@@ -77,8 +77,8 @@ export class UserCommand extends Command {
         });
     }
 
-    private async searchTrack(query: string, requester: string) {
-        return await this.container.kazagumo.search(query, { requester });
+    private async searchTrack(query: string, requester: string, engine: string) {
+        return await this.container.kazagumo.search(query, { requester, engine });
     }
 
     private async handleSearchResult(result: KazagumoSearchResult, player: KazagumoPlayer, author: string, image: string, interaction: Command.ChatInputCommandInteraction) {
