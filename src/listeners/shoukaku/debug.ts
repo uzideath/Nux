@@ -7,5 +7,3 @@ export class UserEvent extends Listener {
         this.container.kazagumo.shoukaku.on('debug', (name, info) => this.container.logger.debug(`Lavalink ${name}: Debug,`, info));
     }
 }
-
-

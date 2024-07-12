@@ -64,6 +64,8 @@ export class UserCommand extends Command {
             player.queue.add(track);
             const trackUrl = track.uri;
             const embed = new AlyaEmbed(`Added [**${track.title}** by **${track.author}**](${trackUrl}) to the queue.`)
+                .setAuthor({ name: interaction.user.displayName, iconURL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/600px-Sign-check-icon.png' })
+                
             await interaction.reply({ embeds: [embed] });
         }
 

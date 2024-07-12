@@ -24,11 +24,11 @@ export class SkipCommand extends Command {
             return this.reply(interaction, 'There are no more songs in the queue.');
         }
 
+        await this.reply(interaction, 'Skipped the current song.');
         player.skip();
-        return this.reply(interaction, 'Skipped the current song.');
     }
 
     private async reply(interaction: Command.ChatInputCommandInteraction, content: string) {
-        await interaction.reply({ content: content, ephemeral: true });
+        await interaction.reply({ content: content, ephemeral: false });
     }
 }

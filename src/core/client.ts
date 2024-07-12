@@ -1,5 +1,5 @@
 import { SapphireClient, LogLevel, container } from "@sapphire/framework";
-import { GatewayIntentBits, Partials } from "discord.js";
+import { ActivityType, GatewayIntentBits, Partials } from "discord.js";
 import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors } from 'shoukaku';
 import config from "../config";
@@ -27,6 +27,15 @@ export class Client extends SapphireClient {
                 GatewayIntentBits.MessageContent
             ],
             partials: [Partials.Channel],
+            presence: {
+                activities: [
+                    {
+                        name: 'You.',
+                        type: ActivityType.Listening
+                    }
+                ],
+                status: 'idle'
+            },
             loadMessageCommandListeners: true
         });
     }
