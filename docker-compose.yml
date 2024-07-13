@@ -6,7 +6,7 @@ services:
     depends_on:
       - lavalink
     volumes:
-      - .:/app
+      - ./:/app
 
   lavalink:
     image: fredboat/lavalink:latest

@@ -64,7 +64,7 @@ export class UserCommand extends Command {
         } else if (query.includes('spotify.com')) {
             return { author: 'Spotify', image: config.Icons.Spotify, engine: 'spotify' };
         }
-        return { author: 'Unknown', image: '', engine: 'default' };
+        return { author: 'Youtube', image: config.Icons.Youtube, engine: 'youtube' };
     }
 
     private async createPlayer(guildId: string, textId: string | undefined, voiceId: string) {
