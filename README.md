@@ -1,6 +1,6 @@
 <div align="center">
 
-## Alya App
+## Alya
 
 Alya is a powerful Discord Music Application, based on Lavalink with [Kazagumo Wrapper](https://github.com/Takiyo0/Kazagumo).
 
