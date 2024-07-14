@@ -1,7 +1,7 @@
 import { SapphireClient, LogLevel, container } from "@sapphire/framework";
 import { getRootData } from "@sapphire/pieces";
-import { ActivityType, GatewayIntentBits, Partials } from "discord.js";
-import { Kazagumo, Plugins } from "kazagumo";
+import { GatewayIntentBits, Partials } from "discord.js";
+import { Kazagumo, Payload, Plugins } from "kazagumo";
 import Spotify from 'kazagumo-spotify'
 import { Connectors } from 'shoukaku';
 import config from "../config";
@@ -12,7 +12,7 @@ export class Client extends SapphireClient {
     private rootData = getRootData();
     constructor() {
         super({
-            defaultPrefix: '!',
+            defaultPrefix: config.Bot.prefix,
             regexPrefix: /^(hey +)?bot[,! ]/i,
             caseInsensitiveCommands: true,
             logger: {
@@ -35,11 +35,11 @@ export class Client extends SapphireClient {
             presence: {
                 activities: [
                     {
-                        name: 'You.',
-                        type: ActivityType.Listening
+                        name: config.Bot.presence.name,
+                        type: config.Bot.presence.type,
                     }
                 ],
-                status: 'idle'
+                status: config.Bot.presence.status
             },
             loadMessageCommandListeners: true
         });
@@ -48,8 +48,8 @@ export class Client extends SapphireClient {
 
     public override login(token?: string) {
         container.kazagumo = new Kazagumo({
-            defaultSearchEngine: "youtube",
-            send: (guildId, payload) => {
+            defaultSearchEngine: config.Bot.searchEngine,
+            send: (guildId: string, payload: Payload) => {
                 const guild = this.guilds.cache.get(guildId);
                 if (guild) guild.shard.send(payload);
             },

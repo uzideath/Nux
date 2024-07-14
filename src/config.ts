@@ -1,9 +1,17 @@
 import { envParseString } from "@skyra/env-utilities";
-import { Time } from "@sapphire/time-utilities";
+import { ActivityType } from "discord.js";
+import { ConfigType } from "./types";
 
-export default {
+const config: ConfigType = {
     Bot: {
-        inactivity: Time.Minute * 5
+        prefix: "!",
+        searchEngine: "youtube",
+        inactivity: 5,  // Minutes
+        presence: {
+            name: "Your thoughts.",
+            type: ActivityType.Listening,
+            status: "idle"
+        }
     },
     Nodes: [{
         name: envParseString('LAVALINK_NAME'),
@@ -24,3 +32,5 @@ export default {
         warn: '<:cattowarn:1109936311399350433>'
     }
 };
+
+export default config;
