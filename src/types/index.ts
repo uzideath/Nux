@@ -30,6 +30,7 @@ interface IconsConfig {
 interface EmojisConfig {
     check: string;
     warn: string;
+    error: string;
 }
 
 interface Config {

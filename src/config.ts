@@ -29,7 +29,8 @@ const config: ConfigType = {
     },
     emojis: {
         check: '<:accepted:1083594549575823430>',
-        warn: '<:cattowarn:1109936311399350433>'
+        warn: '<:cattowarn:1109936311399350433>',
+        error: '<a:cattonope:1078929462290292756>'
     }
 };
 
