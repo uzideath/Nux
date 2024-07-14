@@ -10,14 +10,13 @@ import { envParseString } from "@skyra/env-utilities";
 
 export class Client extends SapphireClient {
     private rootData = getRootData();
-
     constructor() {
         super({
             defaultPrefix: config.Bot.prefix,
             regexPrefix: /^(hey +)?bot[,! ]/i,
             caseInsensitiveCommands: true,
             logger: {
-                level: LogLevel.Debug
+                level: LogLevel.Info
             },
             shards: 'auto',
             intents: [
@@ -44,23 +43,17 @@ export class Client extends SapphireClient {
             },
             loadMessageCommandListeners: true
         });
-        
-        this.registerListeners();
-    }
 
-    private registerListeners(): void {
         this.stores.get('listeners').registerPath(join(this.rootData.root, 'events'));
     }
 
     public override async login(token?: string): Promise<string> {
-        this.initializeKazagumo();
-        return super.login(token);
-    }
-
-    private initializeKazagumo(): void {
         container.kazagumo = new Kazagumo({
             defaultSearchEngine: config.Bot.searchEngine,
-            send: this.sendPayload.bind(this),
+            send: (guildId: string, payload: Payload) => {
+                const guild = this.guilds.cache.get(guildId)
+                if (guild) guild.shard.send(payload)
+            },
             plugins: [
                 new Plugins.PlayerMoved(this),
                 new Spotify({
@@ -70,14 +63,9 @@ export class Client extends SapphireClient {
                 })
             ]
         }, new Connectors.DiscordJS(this), config.Nodes);
-    }
-
-    private sendPayload(guildId: string, payload: Payload): void {
-        const guild = this.guilds.cache.get(guildId);
-        if (guild) {
-            guild.shard.send(payload);
-        }
+        return super.login(token);
     }
 }
 
 export const client = new Client();
+

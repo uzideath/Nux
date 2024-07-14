@@ -1,6 +1,8 @@
-import { Listener as Event } from '@sapphire/framework';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Listener } from '@sapphire/framework';
 
-export class DisconnectEventListener extends Event {
+@ApplyOptions<Listener.Options>({ event: 'ready', once: false })
+export class DisconnectEventListener extends Listener {
     public override async run() {
         this.container.kazagumo.shoukaku.on('disconnect', (name) => {
             const players = [...this.container.kazagumo.shoukaku.players.values()].filter(p => p.node.name === name);
