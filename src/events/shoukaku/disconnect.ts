@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Listener } from '@sapphire/framework';
 
-@ApplyOptions<Listener.Options>({ once: true })
+@ApplyOptions<Listener.Options>({ once: true, event: 'disconnect' })
 export class UserEvent extends Listener {
     public override async run() {
         this.container.kazagumo.shoukaku.on('disconnect', (name) => {
