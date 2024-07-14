@@ -1,12 +1,9 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Listener } from '@sapphire/framework';
+import { Listener as Event } from '@sapphire/framework';
 import { TextChannel, EmbedBuilder, Colors } from 'discord.js';
 import { Time } from '@sapphire/time-utilities'
 import config from '../../config';
-import { Events } from 'kazagumo';
 
-@ApplyOptions<Listener.Options>({ event: Events.PlayerEmpty, once: true })
-export class UserEvent extends Listener<typeof Events.PlayerEmpty> {
+export class PlayerEmptyEventListener extends Event {
     public override async run() {
         this.container.kazagumo.on('playerEmpty', (player) => {
             setTimeout(() => {

@@ -1,11 +1,8 @@
 import { TextChannel, EmbedBuilder, Colors } from 'discord.js';
-import { ApplyOptions } from '@sapphire/decorators';
-import { Listener } from '@sapphire/framework';
-import { Events } from 'kazagumo';
+import { Listener as Event } from '@sapphire/framework';
 import config from '../../config';
 
-@ApplyOptions<Listener.Options>({ event: Events.PlayerEnd, once: true })
-export class UserEvent extends Listener<typeof Events.PlayerEnd> {
+export class PlayerEndEventListener extends Event {
     public override async run() {
         this.container.kazagumo.on('playerEnd', async (player) => {
             if (player.queue.size === 0) {

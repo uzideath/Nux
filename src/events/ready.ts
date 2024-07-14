@@ -1,12 +1,12 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Listener } from '@sapphire/framework';
+import { Listener as Event } from '@sapphire/framework';
 import type { StoreRegistryValue } from '@sapphire/pieces';
 import { blue, gray, green, magenta, magentaBright, white, yellow } from 'colorette';
 
 const dev = process.env.NODE_ENV !== 'production';
 
-@ApplyOptions<Listener.Options>({ once: true })
-export class UserEvent extends Listener {
+@ApplyOptions<Event.Options>({ once: true })
+export class ReadyEvent extends Event {
 	private readonly style = dev ? yellow : blue;
 
 	public override run() {
