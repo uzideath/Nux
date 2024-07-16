@@ -17,11 +17,7 @@ Alya is a Discord Music Application, based on Lavalink with [Kazagumo Wrapper](h
 
 </div>
 
-## Features
-
 - **Spotify and Youtube Support**
-- **Easy deploy**
-- **Scalable and Modular**
 
 ## Self host.
 
