@@ -34,12 +34,12 @@ export class LoopCommand extends Command {
 
         if (player.loop === 'queue') {
             player.setLoop('none');
-            const embed = new AlyaEmbed(`Loop mode has been disabled ${config.emojis.check}`, this.container.client.application?.bot?.displayName!)
+            const embed = new AlyaEmbed(`Loop mode has been disabled ${config.emojis.check}`)
                 .setColor(Colors.White);
             return interaction.editReply({ embeds: [embed] });
         } else {
             player.setLoop('queue');
-            const embed = new AlyaEmbed(`Loop mode has been enabled ${config.emojis.check}`, this.container.client.application?.bot?.displayName!)
+            const embed = new AlyaEmbed(`Loop mode has been enabled ${config.emojis.check}`)
                 .setColor(Colors.White);
             return interaction.editReply({ embeds: [embed] });
         }

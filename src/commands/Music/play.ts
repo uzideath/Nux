@@ -107,18 +107,18 @@ export class UserCommand extends Command {
     }
 
     private createPlaylistEmbed(playlistName: string, author: string, image: string) {
-        return new AlyaEmbed(`Added playlist **${playlistName}** to the queue.`, this.container.client.application?.bot?.displayName || "Alya")
+        return new AlyaEmbed(`Added playlist **${playlistName}** to the queue.`)
             .setColor(Colors.White)
             .setAuthor({ name: author, iconURL: image });
     }
 
     private createTrackEmbed(title: string, trackAuthor: string, url: string, author: string, image: string) {
-        return new AlyaEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`, this.container.client.application?.bot?.displayName || "Alya")
+        return new AlyaEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`)
             .setAuthor({ name: author, iconURL: image });
     }
 
     private sendErrorEmbed(interaction: Command.ChatInputCommandInteraction, errorMessage: string) {
-        const errorEmbed = new AlyaEmbed(errorMessage, this.container.client.application?.bot?.displayName || "Alya")
+        const errorEmbed = new AlyaEmbed(errorMessage)
             .setColor(Colors.Red)
             .setAuthor({ name: 'Error', iconURL: config.Icons.Error });
 

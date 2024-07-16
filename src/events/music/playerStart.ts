@@ -10,7 +10,7 @@ export class PlayerStartListener extends Listener {
         this.container.kazagumo.on('playerStart', (player: KazagumoPlayer, track) => {
             const channel = this.container.client.channels.cache.get(player.textId!) as TextChannel;
             if (channel) {
-                const embed = new AlyaEmbed(`[**${track.title}**](${track.uri})`, this.container.client.application?.bot?.displayName!)
+                const embed = new AlyaEmbed(`[**${track.title}**](${track.uri})`)
                 channel.send({ embeds: [embed] });
             }
         });
