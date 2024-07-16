@@ -7,7 +7,6 @@ export class AlyaEmbed extends EmbedBuilder {
         this.setColor(Colors.White)
             .setAuthor({ name: 'Now playing...', iconURL: config.Icons.Playing })
             .setDescription(description)
-            .setFooter({ text: "‎", iconURL: config.Icons.Bot })
             .setTimestamp();
     }
 }

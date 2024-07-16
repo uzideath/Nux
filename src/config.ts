@@ -20,7 +20,7 @@ const config: ConfigType = {
         secure: false
     }],
     Icons: {
-        Bot: 'https://media1.tenor.com/m/U5qzaBC8PtgAAAAC/anime-alya.gif',
+        Bot: 'https://i.imgur.com/MmPlPMF.gif',
         Check: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/600px-Sign-check-icon.png',
         Error: 'https://cdn3.emoji.gg/emojis/6426-error.png',
         Playing: 'https://cdn.darrennathanael.com/icons/spinning_disk.gif',
