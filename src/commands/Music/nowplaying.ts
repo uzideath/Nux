@@ -31,7 +31,7 @@ export class NowPlayingCommand extends Command {
 
         const currentTrack = player.queue.current;
         const trackUrl = currentTrack?.uri;
-        const embed = new AlyaEmbed(`[**${currentTrack?.title}** by **${currentTrack?.author}**](${trackUrl})`)
+        const embed = new AlyaEmbed(`[**${currentTrack?.title}** by **${currentTrack?.author}**](${trackUrl})`, this.container.client.application?.bot?.displayName!)
             .setColor(Colors.White)
             .setAuthor({ name: 'Now Playing', iconURL: config.Icons.Playing }) 
 
