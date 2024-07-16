@@ -19,6 +19,7 @@ export class LoopCommand extends AlyaCommand {
         await interaction.deferReply();
 
         if (!await this.MemberInVoiceChannel(interaction)) return;
+        if (!await this.MemberInBotVoiceChannel(interaction)) return;
 
         const player = await this.PlayerExists(interaction);
         if (!player) return;

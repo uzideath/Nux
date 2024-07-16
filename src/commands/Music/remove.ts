@@ -27,6 +27,8 @@ export class RemoveCommand extends AlyaCommand {
         const position = interaction.options.getNumber('position', true);
 
         if (!await this.MemberInVoiceChannel(interaction)) return;
+        if (!await this.MemberInBotVoiceChannel(interaction)) return;
+        
         const player = await this.PlayerExists(interaction);
         if (!player) return;
         if (!await this.QueueNotEmpty(interaction, player)) return;

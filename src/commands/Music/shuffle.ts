@@ -20,6 +20,8 @@ export class ShuffleCommand extends AlyaCommand {
         await interaction.deferReply();
 
         if (!await this.MemberInVoiceChannel(interaction)) return;
+        if (!await this.MemberInBotVoiceChannel(interaction)) return;
+
         const player = await this.PlayerExists(interaction);
         if (!player) return;
         if (!await this.QueueNotEmpty(interaction, player)) return;

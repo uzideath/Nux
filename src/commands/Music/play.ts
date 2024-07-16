@@ -4,11 +4,12 @@ import { KazagumoPlayer, KazagumoSearchResult } from 'kazagumo';
 import { AlyaEmbed } from '../../utils/embed';
 import { Colors } from 'discord.js';
 import config from '../../config';
+import { AlyaCommand } from '../../lib/command';
 
 @ApplyOptions<Command.Options>({
     description: 'Play a song or playlist from search'
 })
-export class UserCommand extends Command {
+export class UserCommand extends AlyaCommand {
     public override registerApplicationCommands(registry: Command.Registry) {
         registry.registerChatInputCommand((builder) =>
             builder
@@ -30,7 +31,12 @@ export class UserCommand extends Command {
         await interaction.deferReply();
 
         if (!member?.voice.channel) {
-            return this.sendErrorEmbed(interaction, 'You must be in a voice channel to use this command.');
+            return this.Error(interaction, 'You must be in a voice channel to use this command.');
+        }
+
+        const existingPlayer = this.container.kazagumo.players.get(interaction.guildId!);
+        if (existingPlayer) {
+            return this.Error(interaction, `I am already playing music in another voice channel. ${config.emojis.error}`);
         }
 
         const { author, image, engine } = this.getSourceInfo(query);
@@ -40,7 +46,7 @@ export class UserCommand extends Command {
             player = await this.createPlayer(interaction.guildId!, interaction.channel?.id!, member.voice.channelId!);
         } catch (error) {
             console.error('Error creating the player:', error);
-            return this.sendErrorEmbed(interaction, 'There was an error creating the player.');
+            return this.Error(interaction, 'There was an error creating the player.');
         }
 
         let result: KazagumoSearchResult;
@@ -48,11 +54,11 @@ export class UserCommand extends Command {
             result = await this.searchTrack(query, interaction.user.displayName, engine);
         } catch (error) {
             console.error('Error searching for the song:', error);
-            return this.sendErrorEmbed(interaction, 'There was an error searching for the song.');
+            return this.Error(interaction, 'There was an error searching for the song.');
         }
 
         if (!result.tracks.length) {
-            return this.sendErrorEmbed(interaction, 'No results were found.');
+            return this.Error(interaction, 'No results were found.');
         }
 
         return await this.handleSearchResult(result, player, author, image, interaction);
@@ -97,12 +103,12 @@ export class UserCommand extends Command {
             if (!player.playing && !player.paused) {
                 player.play().catch(error => {
                     console.error('Error playing the track:', error);
-                    this.sendErrorEmbed(interaction, 'There was an error playing the track.');
+                    this.Error(interaction, 'There was an error playing the track.');
                 });
             }
         } catch (error) {
             console.error('Error handling search result:', error);
-            this.sendErrorEmbed(interaction, 'There was an error handling the search result.');
+            this.Error(interaction, 'There was an error handling the search result.');
         }
     }
 
@@ -115,13 +121,5 @@ export class UserCommand extends Command {
     private createTrackEmbed(title: string, trackAuthor: string, url: string, author: string, image: string) {
         return new AlyaEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`)
             .setAuthor({ name: author, iconURL: image });
-    }
-
-    private sendErrorEmbed(interaction: Command.ChatInputCommandInteraction, errorMessage: string) {
-        const errorEmbed = new AlyaEmbed(errorMessage)
-            .setColor(Colors.Red)
-            .setAuthor({ name: 'Error', iconURL: config.Icons.Error });
-
-        interaction.editReply({ content: '', embeds: [errorEmbed] });
     }
 }

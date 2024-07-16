@@ -1,12 +1,13 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
+import { Colors } from 'discord.js';
 import config from '../../config';
-import { EmbedBuilder } from '@discordjs/builders';
+import { AlyaCommand } from '../../lib/command';
 
 @ApplyOptions<Command.Options>({
     description: 'Skip the current song and play the next one in the queue'
 })
-export class SkipCommand extends Command {
+export class SkipCommand extends AlyaCommand {
     public override registerApplicationCommands(registry: Command.Registry) {
         registry.registerChatInputCommand((builder) =>
             builder
@@ -16,29 +17,21 @@ export class SkipCommand extends Command {
     }
 
     public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-        const player = this.container.kazagumo.players.get(interaction.guildId!);
+        await interaction.deferReply();
 
-        if (!player) {
-            return interaction.reply({
-                content: 'There is no active player in this server.',
-                ephemeral: true
-            });
-        }
+        if (!await this.MemberInVoiceChannel(interaction)) return;
+        if (!await this.MemberInBotVoiceChannel(interaction)) return;
+
+        const player = await this.PlayerExists(interaction);
+        if (!player) return;
 
         if (player.queue.length === 0) {
             player.shoukaku.stopTrack();
-            return interaction.reply({
-                content: `There are no more songs in the queue. Stopping ${config.emojis.check}`,
-                ephemeral: false
-            });
+            await this.Reply(interaction, `There are no more songs in the queue. Stopping ${config.emojis.check}`, Colors.Red);
+            return;
         }
 
-        await interaction.reply({
-            embeds: [
-                new EmbedBuilder().setDescription(`Skipped. ${config.emojis.check}`)
-            ],
-            ephemeral: true
-        });
+        await this.Reply(interaction, `Skipped. ${config.emojis.check}`, Colors.Green);
 
         setTimeout(async () => {
             await interaction.deleteReply();
