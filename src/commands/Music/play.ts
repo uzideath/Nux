@@ -34,11 +34,6 @@ export class UserCommand extends AlyaCommand {
             return this.Error(interaction, 'You must be in a voice channel to use this command.');
         }
 
-        const existingPlayer = this.container.kazagumo.players.get(interaction.guildId!);
-        if (existingPlayer) {
-            return this.Error(interaction, `I am already playing music in another voice channel. ${config.emojis.error}`);
-        }
-
         const { author, image, engine } = this.getSourceInfo(query);
 
         let player: KazagumoPlayer;
