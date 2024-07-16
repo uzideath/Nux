@@ -1,12 +1,12 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
-import { EmbedBuilder, Colors } from 'discord.js';
 import config from '../../config';
+import { AlyaCommand } from '../../lib/command';
 
 @ApplyOptions<Command.Options>({
     description: 'Removes a song from the playing queue.'
 })
-export class RemoveCommand extends Command {
+export class RemoveCommand extends AlyaCommand {
     public override registerApplicationCommands(registry: Command.Registry) {
         registry.registerChatInputCommand((builder) =>
             builder
@@ -22,35 +22,21 @@ export class RemoveCommand extends Command {
     }
 
     public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-        const member = await interaction.guild?.members.fetch(interaction.user.id);
-        const position = interaction.options.getNumber('position', true);
-
         await interaction.deferReply();
 
-        if (!member?.voice.channel) {
-            return interaction.editReply(`You must be in a voice channel to use this command. ${config.emojis.error}`);
-        }
+        const position = interaction.options.getNumber('position', true);
 
-        const player = this.container.kazagumo.players.get(interaction.guildId!);
-
-        if (!player) {
-            return interaction.editReply(`There is no active player in this server. ${config.emojis.error}`);
-        }
-
-        if (player.queue.size === 0) {
-            return interaction.editReply(`The queue is currently empty. ${config.emojis.error}`);
-        }
+        if (!await this.MemberInVoiceChannel(interaction)) return;
+        const player = await this.PlayerExists(interaction);
+        if (!player) return;
+        if (!await this.QueueNotEmpty(interaction, player)) return;
 
         if (position < 1 || position > player.queue.size) {
-            return interaction.editReply(`Invalid position provided. The queue currently has ${player.queue.size} songs. ${config.emojis.error}`);
+            await this.Reply(interaction, `Invalid position provided. The queue currently has ${player.queue.size} songs. ${config.emojis.error}`);
+            return;
         }
 
         player.queue.remove(position - 1);
-
-        const embed = new EmbedBuilder()
-            .setDescription(`The song at position ${position} has been removed. ${config.emojis.check}`)
-            .setColor(Colors.White);
-
-        return interaction.editReply({ embeds: [embed] });
+        await this.Reply(interaction, `The song at position ${position} has been removed. ${config.emojis.check}`);
     }
 }

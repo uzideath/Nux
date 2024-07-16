@@ -3,11 +3,12 @@ import { Command } from '@sapphire/framework';
 import { AlyaEmbed } from '../../utils/embed';
 import { Colors } from 'discord.js';
 import config from '../../config';
+import { AlyaCommand } from '../../lib/command';
 
 @ApplyOptions<Command.Options>({
     description: 'Show the currently playing song'
 })
-export class NowPlayingCommand extends Command {
+export class NowPlayingCommand extends AlyaCommand {
     public override registerApplicationCommands(registry: Command.Registry) {
         registry.registerChatInputCommand((builder) =>
             builder
@@ -17,11 +18,7 @@ export class NowPlayingCommand extends Command {
     }
 
     public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-        const member = await interaction.guild?.members.fetch(interaction.user.id);
-
-        if (!member?.voice.channel) {
-            return interaction.reply('You must be in a voice channel to use this command.');
-        }
+        if (!await this.MemberInVoiceChannel(interaction)) return;
 
         let player = this.container.kazagumo.players.get(interaction.guildId!);
 
@@ -33,7 +30,7 @@ export class NowPlayingCommand extends Command {
         const trackUrl = currentTrack?.uri;
         const embed = new AlyaEmbed(`[**${currentTrack?.title}** by **${currentTrack?.author}**](${trackUrl})`)
             .setColor(Colors.White)
-            .setAuthor({ name: 'Now Playing', iconURL: config.Icons.Playing }) 
+            .setAuthor({ name: 'Now Playing', iconURL: config.Icons.Playing })
 
         return await interaction.reply({ content: '', embeds: [embed] });
     }

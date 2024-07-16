@@ -1,4 +1,5 @@
 import { ActivityType, PresenceStatusData } from "discord.js";
+import { KazagumoPlayer } from "kazagumo";
 
 interface BotConfig {
     prefix: string;
@@ -42,3 +43,9 @@ interface Config {
 }
 
 export type ConfigType = Config;
+
+interface AlyaPlayer extends KazagumoPlayer {
+    shuffleMode?: boolean;
+}
+
+export type AlyaPlayerType = AlyaPlayer;

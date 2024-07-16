@@ -1,11 +1,12 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { Colors, GuildMember } from 'discord.js';
+import { AlyaCommand } from '../../lib/command';
 
 @ApplyOptions<Command.Options>({
     description: 'Stop the music and leave the voice channel'
 })
-export class StopCommand extends Command {
+export class StopCommand extends AlyaCommand {
     public override registerApplicationCommands(registry: Command.Registry) {
         registry.registerChatInputCommand((builder) =>
             builder
@@ -15,26 +16,26 @@ export class StopCommand extends Command {
     }
 
     public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-        const player = this.container.kazagumo.players.get(interaction.guildId!);
+        await interaction.deferReply();
 
+        const member = interaction.member as GuildMember;
+        const botVoiceChannel = interaction.guild?.members.me?.voice.channel;
+        const memberVoiceChannel = member.voice.channel;
+
+        if (!await this.MemberInVoiceChannel(interaction)) return;
+
+        if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel!.id) {
+            await this.Reply(interaction, 'You need to be in the same voice channel as me to use this command.', Colors.Red);
+            return;
+        }
+
+        const player = await this.PlayerExists(interaction);
         if (!player) {
-            return this.reply(interaction, 'There is no active player in this server.');
+            await this.Reply(interaction, 'No music is currently playing.', Colors.Red);
+            return;
         }
 
         player.destroy();
-
-        const embed = new EmbedBuilder()
-            .setDescription('Music stopped and bot disconnected from the voice channel.')
-            .setColor('#FF0000');
-
-        return interaction.reply({ embeds: [embed], ephemeral: false });
-    }
-
-    private async reply(interaction: Command.ChatInputCommandInteraction, content: string) {
-        const embed = new EmbedBuilder()
-            .setDescription(content)
-            .setColor('#FF0000');
-
-        await interaction.reply({ embeds: [embed], ephemeral: false });
+        await this.Reply(interaction, 'Music stopped and bot disconnected from the voice channel.', Colors.Red);
     }
 }

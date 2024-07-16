@@ -2,11 +2,12 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { Command } from '@sapphire/framework';
 import { EmbedBuilder, ButtonStyle, ComponentType, Colors } from 'discord.js';
+import { AlyaCommand } from '../../lib/command';
 
 @ApplyOptions<Command.Options>({
     description: 'Show the current song queue'
 })
-export class QueueCommand extends Command {
+export class QueueCommand extends AlyaCommand {
     public override registerApplicationCommands(registry: Command.Registry) {
         registry.registerChatInputCommand((builder) =>
             builder
@@ -15,22 +16,14 @@ export class QueueCommand extends Command {
         );
     }
 
+
     public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-        const player = this.container.kazagumo.players.get(interaction.guildId!);
+        await interaction.deferReply();
 
-        if (!player) {
-            return await interaction.reply({
-                content: 'There is no active player in this server.',
-                ephemeral: true
-            });
-        }
+        const player = await this.PlayerExists(interaction);
+        if (!player) return;
 
-        if (player.queue.length === 0) {
-            return await interaction.reply({
-                content: 'The queue is currently empty.',
-                ephemeral: true
-            })
-        }
+        if (!await this.QueueNotEmpty(interaction, player)) return;
 
         const paginatedMessage = new PaginatedMessage({
             template: new EmbedBuilder()
@@ -66,7 +59,7 @@ export class QueueCommand extends Command {
             },
             {
                 customId: '@sapphire/paginated-messages.previousPage',
-                style: ButtonStyle.Primary,
+                style: ButtonStyle.Primary, 
                 emoji: '◀️',
                 type: ComponentType.Button,
                 run: ({ handler }) => {
