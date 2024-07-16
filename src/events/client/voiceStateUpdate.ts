@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
-import { TextChannel, VoiceState } from 'discord.js';
+import { Colors, EmbedBuilder, TextChannel, VoiceState } from 'discord.js';
 import config from '../../config';
 import { KazagumoPlayer } from 'kazagumo';
 
@@ -40,7 +40,11 @@ export class VoiceStateUpdateListener extends Listener {
                 const channel = await this.container.client.channels.fetch(channelId);
                 if (channel && channel instanceof TextChannel) {
                     await channel.send({
-                        content: `I've been disconnected, the queue has been cleared. ${config.emojis.check}`
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor(Colors.White)
+                                .setDescription(`I've been disconnected, the queue has been cleared. ${config.emojis.check}`)
+                        ]
                     });
                 }
             }
