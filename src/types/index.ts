@@ -21,6 +21,7 @@ interface NodeConfig {
 interface IconsConfig {
     Bot: string;
     Check: string;
+    Error: string;
     Playing: string;
     Loading: string;
     Youtube: string;

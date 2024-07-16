@@ -30,7 +30,7 @@ export class UserCommand extends Command {
         await interaction.deferReply();
 
         if (!member?.voice.channel) {
-            return interaction.editReply('You must be in a voice channel to use this command.');
+            return this.sendErrorEmbed(interaction, 'You must be in a voice channel to use this command.');
         }
 
         const { author, image, engine } = this.getSourceInfo(query);
@@ -40,7 +40,7 @@ export class UserCommand extends Command {
             player = await this.createPlayer(interaction.guildId!, interaction.channel?.id!, member.voice.channelId!);
         } catch (error) {
             console.error('Error creating the player:', error);
-            return interaction.editReply('There was an error creating the player.');
+            return this.sendErrorEmbed(interaction, 'There was an error creating the player.');
         }
 
         let result: KazagumoSearchResult;
@@ -48,11 +48,11 @@ export class UserCommand extends Command {
             result = await this.searchTrack(query, interaction.user.displayName, engine);
         } catch (error) {
             console.error('Error searching for the song:', error);
-            return interaction.editReply('There was an error searching for the song.');
+            return this.sendErrorEmbed(interaction, 'There was an error searching for the song.');
         }
 
         if (!result.tracks.length) {
-            return interaction.editReply('No results were found.');
+            return this.sendErrorEmbed(interaction, 'No results were found.');
         }
 
         return await this.handleSearchResult(result, player, author, image, interaction);
@@ -82,22 +82,27 @@ export class UserCommand extends Command {
     }
 
     private async handleSearchResult(result: KazagumoSearchResult, player: KazagumoPlayer, author: string, image: string, interaction: Command.ChatInputCommandInteraction) {
-        if (result.type === 'PLAYLIST') {
-            result.tracks.forEach(track => player.queue.add(track));
-            const embed = this.createPlaylistEmbed(result.playlistName!, author, image);
-            await interaction.editReply({ content: '', embeds: [embed] });
-        } else {
-            const track = result.tracks[0];
-            player.queue.add(track);
-            const embed = this.createTrackEmbed(track.title, track.author!, track.uri!, author, image);
-            await interaction.editReply({ content: '', embeds: [embed] });
-        }
+        try {
+            if (result.type === 'PLAYLIST') {
+                result.tracks.forEach(track => player.queue.add(track));
+                const embed = this.createPlaylistEmbed(result.playlistName!, author, image);
+                await interaction.editReply({ content: '', embeds: [embed] });
+            } else {
+                const track = result.tracks[0];
+                player.queue.add(track);
+                const embed = this.createTrackEmbed(track.title, track.author!, track.uri!, author, image);
+                await interaction.editReply({ content: '', embeds: [embed] });
+            }
 
-        if (!player.playing && !player.paused) {
-            player.play().catch(error => {
-                console.error('Error playing the track:', error);
-                interaction.editReply('There was an error playing the track.');
-            });
+            if (!player.playing && !player.paused) {
+                player.play().catch(error => {
+                    console.error('Error playing the track:', error);
+                    this.sendErrorEmbed(interaction, 'There was an error playing the track.');
+                });
+            }
+        } catch (error) {
+            console.error('Error handling search result:', error);
+            this.sendErrorEmbed(interaction, 'There was an error handling the search result.');
         }
     }
 
@@ -110,5 +115,13 @@ export class UserCommand extends Command {
     private createTrackEmbed(title: string, trackAuthor: string, url: string, author: string, image: string) {
         return new AlyaEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`)
             .setAuthor({ name: author, iconURL: image });
+    }
+
+    private sendErrorEmbed(interaction: Command.ChatInputCommandInteraction, errorMessage: string) {
+        const errorEmbed = new AlyaEmbed(errorMessage)
+            .setColor(Colors.Red)
+            .setAuthor({ name: 'Error', iconURL: config.Icons.Error });
+
+        interaction.editReply({ content: '', embeds: [errorEmbed] });
     }
 }

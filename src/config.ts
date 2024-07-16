@@ -22,6 +22,7 @@ const config: ConfigType = {
     Icons: {
         Bot: 'https://i.pinimg.com/736x/e2/48/cf/e248cffd8b8c0fc9542d9ac71179b9fe.jpg',
         Check: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/600px-Sign-check-icon.png',
+        Error: 'https://cdn3.emoji.gg/emojis/6426-error.png',
         Playing: 'https://cdn.darrennathanael.com/icons/spinning_disk.gif',
         Loading: 'https://cdn3.emoji.gg/emojis/43294-youtube-loading-circle.gif',
         Youtube: 'https://cdn3.emoji.gg/emojis/17807-youtube.png',
