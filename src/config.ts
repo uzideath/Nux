@@ -3,7 +3,7 @@ import { ActivityType } from "discord.js";
 import { ConfigType } from "./types";
 
 const config: ConfigType = {
-    Bot: {
+    bot: {
         prefix: "!",
         searchEngine: "youtube",
         inactivity: 5,  // Minutes
@@ -13,20 +13,20 @@ const config: ConfigType = {
             status: "idle"
         }
     },
-    Nodes: [{
+    nodes: [{
         name: envParseString('LAVALINK_NAME'),
         url: envParseString('LAVALINK_URL'),
         auth: envParseString('LAVALINK_AUTH'),
         secure: false
     }],
-    Icons: {
-        Bot: 'https://i.imgur.com/MmPlPMF.gif',
-        Check: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/600px-Sign-check-icon.png',
-        Error: 'https://cdn3.emoji.gg/emojis/6426-error.png',
-        Playing: 'https://cdn.darrennathanael.com/icons/spinning_disk.gif',
-        Loading: 'https://cdn3.emoji.gg/emojis/43294-youtube-loading-circle.gif',
-        Youtube: 'https://cdn3.emoji.gg/emojis/17807-youtube.png',
-        Spotify: 'https://cdn3.emoji.gg/emojis/2320-spotify.png'
+    icons: {
+        bot: 'https://i.imgur.com/MmPlPMF.gif',
+        check: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/600px-Sign-check-icon.png',
+        error: 'https://cdn3.emoji.gg/emojis/6426-error.png',
+        playing: 'https://cdn.darrennathanael.com/icons/spinning_disk.gif',
+        loading: 'https://cdn3.emoji.gg/emojis/43294-youtube-loading-circle.gif',
+        youtube: 'https://cdn3.emoji.gg/emojis/17807-youtube.png',
+        spotify: 'https://cdn3.emoji.gg/emojis/2320-spotify.png'
     },
     emojis: {
         check: '<:accepted:1083594549575823430>',

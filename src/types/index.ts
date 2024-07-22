@@ -20,13 +20,13 @@ interface NodeConfig {
 }
 
 interface IconsConfig {
-    Bot: string;
-    Check: string;
-    Error: string;
-    Playing: string;
-    Loading: string;
-    Youtube: string;
-    Spotify: string;
+    bot: string;
+    check: string;
+    error: string;
+    playing: string;
+    loading: string;
+    youtube: string;
+    spotify: string;
 }
 
 interface EmojisConfig {
@@ -36,9 +36,9 @@ interface EmojisConfig {
 }
 
 interface Config {
-    Bot: BotConfig;
-    Nodes: NodeConfig[];
-    Icons: IconsConfig;
+    bot: BotConfig;
+    nodes: NodeConfig[];
+    icons: IconsConfig;
     emojis: EmojisConfig;
 }
 

@@ -61,11 +61,11 @@ export class UserCommand extends AlyaCommand {
 
     private getSourceInfo(query: string) {
         if (query.includes('youtube.com') || query.includes('youtu.be')) {
-            return { author: 'YouTube', image: config.Icons.Youtube, engine: 'youtube' };
+            return { author: 'YouTube', image: config.icons.youtube, engine: 'youtube' };
         } else if (query.includes('spotify.com')) {
-            return { author: 'Spotify', image: config.Icons.Spotify, engine: 'spotify' };
+            return { author: 'Spotify', image: config.icons.spotify, engine: 'spotify' };
         }
-        return { author: 'Youtube', image: config.Icons.Youtube, engine: 'youtube' };
+        return { author: 'Youtube', image: config.icons.youtube, engine: 'youtube' };
     }
 
     private async createPlayer(guildId: string, textId: string | undefined, voiceId: string) {

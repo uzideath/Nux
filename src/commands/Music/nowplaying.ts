@@ -30,7 +30,7 @@ export class NowPlayingCommand extends AlyaCommand {
         const trackUrl = currentTrack?.uri;
         const embed = new AlyaEmbed(`[**${currentTrack?.title}** by **${currentTrack?.author}**](${trackUrl})`)
             .setColor(Colors.White)
-            .setAuthor({ name: 'Now Playing', iconURL: config.Icons.Playing })
+            .setAuthor({ name: 'Now Playing', iconURL: config.icons.playing })
 
         return await interaction.reply({ content: '', embeds: [embed] });
     }

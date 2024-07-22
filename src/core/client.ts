@@ -12,7 +12,7 @@ export class Client extends SapphireClient {
     private rootData = getRootData();
     constructor() {
         super({
-            defaultPrefix: config.Bot.prefix,
+            defaultPrefix: config.bot.prefix,
             regexPrefix: /^(hey +)?bot[,! ]/i,
             caseInsensitiveCommands: true,
             logger: {
@@ -35,11 +35,11 @@ export class Client extends SapphireClient {
             presence: {
                 activities: [
                     {
-                        name: config.Bot.presence.name,
-                        type: config.Bot.presence.type,
+                        name: config.bot.presence.name,
+                        type: config.bot.presence.type,
                     }
                 ],
-                status: config.Bot.presence.status
+                status: config.bot.presence.status
             },
             loadMessageCommandListeners: true
         });
@@ -49,7 +49,7 @@ export class Client extends SapphireClient {
 
     public override async login(token?: string): Promise<string> {
         container.kazagumo = new Kazagumo({
-            defaultSearchEngine: config.Bot.searchEngine,
+            defaultSearchEngine: config.bot.searchEngine,
             send: (guildId: string, payload: Payload) => {
                 const guild = this.guilds.cache.get(guildId)
                 if (guild) guild.shard.send(payload)
@@ -62,7 +62,7 @@ export class Client extends SapphireClient {
                     playlistPageLimit: 1000
                 })
             ]
-        }, new Connectors.DiscordJS(this), config.Nodes);
+        }, new Connectors.DiscordJS(this), config.nodes);
         return super.login(token);
     }
 }

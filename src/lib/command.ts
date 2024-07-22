@@ -60,7 +60,7 @@ export abstract class AlyaCommand extends Command {
     protected Error(interaction: Command.ChatInputCommandInteraction, errorMessage: string) {
         const errorEmbed = new AlyaEmbed(errorMessage)
             .setColor(Colors.Red)
-            .setAuthor({ name: 'Error', iconURL: config.Icons.Error });
+            .setAuthor({ name: 'Error', iconURL: config.icons.error });
 
         interaction.editReply({ content: '', embeds: [errorEmbed] });
     }
