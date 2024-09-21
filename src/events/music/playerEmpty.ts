@@ -22,7 +22,7 @@ export class PlayerEmptyListener extends Listener {
                     }
                     player.destroy();
                 }
-            }, Time.Minute * config.Bot.inactivity);
+            }, Time.Minute * config.bot.inactivity);
         });
     }
 }

@@ -23,7 +23,7 @@ const config: ConfigType = {
         bot: 'https://i.imgur.com/MmPlPMF.gif',
         check: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/600px-Sign-check-icon.png',
         error: 'https://cdn3.emoji.gg/emojis/6426-error.png',
-        playing: 'https://cdn.darrennathanael.com/icons/spinning_disk.gif',
+        playing: 'https://cdn3.emoji.gg/emojis/6115-dance.gif',
         loading: 'https://cdn3.emoji.gg/emojis/43294-youtube-loading-circle.gif',
         youtube: 'https://cdn3.emoji.gg/emojis/17807-youtube.png',
         spotify: 'https://cdn3.emoji.gg/emojis/2320-spotify.png'
