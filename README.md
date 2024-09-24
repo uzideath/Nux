@@ -12,7 +12,7 @@ Nux is a Discord Music Application, based on Lavalink with [Kazagumo Wrapper](ht
 ![GitHub last commit](https://img.shields.io/github/last-commit/arestosora/Alya) 
 
 <p>
-  <img src=".github/assets/image.png" alt="Alya sometimes hides her feelings in russian.">
+  <img src=".github/assets/image.jpg" alt="Nux.">
 </p>
 
 </div>
