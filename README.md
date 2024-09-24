@@ -1,8 +1,8 @@
 <div align="center">
 
-## Alya
+## Nux
 
-Alya is a Discord Music Application, based on Lavalink with [Kazagumo Wrapper](https://github.com/Takiyo0/Kazagumo).
+Nux is a Discord Music Application, based on Lavalink with [Kazagumo Wrapper](https://github.com/Takiyo0/Kazagumo).
 
 ![AppVeyor](https://img.shields.io/appveyor/build/Takiyo0/kazagumo) 
 ![Downloads](https://img.shields.io/npm/dm/kazagumo) 
