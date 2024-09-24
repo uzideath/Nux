@@ -8,7 +8,7 @@ const config: ConfigType = {
         searchEngine: "youtube",
         inactivity: 5,  // Minutes
         presence: {
-            name: "Your thoughts.",
+            name: "/play",
             type: ActivityType.Listening,
             status: "idle"
         }
