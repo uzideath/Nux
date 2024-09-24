@@ -25,7 +25,9 @@ export class StopCommand extends AlyaCommand {
         const player = await this.PlayerExists(interaction);
         if (!player) return this.Reply(interaction, `There's nothing playing right now. ${config.emojis.error}`);
 
-        player.destroy();
+        player.destroy().catch(e => {
+            this.container.logger.warn(`Player is already destroyed ${e}`)
+        })
         await this.Reply(interaction, `Music stopped and bot disconnected from the voice channel. ${config.emojis.check}`, Colors.Red);
     }
 }
