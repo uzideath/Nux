@@ -11,10 +11,6 @@ Nux is a Discord Music Application, based on Lavalink with [Kazagumo Wrapper](ht
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/arestosora/Alya) 
 ![GitHub last commit](https://img.shields.io/github/last-commit/arestosora/Alya) 
 
-<p>
-  <img src=".github/assets/image.jpg" alt="Nux.">
-</p>
-
 </div>
 
 - **Spotify and Youtube Support**
