@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
-import { AlyaEmbed } from '../../utils/embed';
+import { CustomEmbed } from '../../utils/embed';
 import { Colors } from 'discord.js';
 import config from '../../config';
 import { AlyaCommand } from '../../lib/command';
@@ -28,7 +28,7 @@ export class NowPlayingCommand extends AlyaCommand {
 
         const currentTrack = player.queue.current;
         const trackUrl = currentTrack?.uri;
-        const embed = new AlyaEmbed(`[**${currentTrack?.title}** by **${currentTrack?.author}**](${trackUrl})`)
+        const embed = new CustomEmbed(`[**${currentTrack?.title}** by **${currentTrack?.author}**](${trackUrl})`)
             .setColor(Colors.White)
             .setAuthor({ name: 'Now Playing', iconURL: config.icons.playing })
 

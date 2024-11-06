@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
 import { KazagumoPlayer, KazagumoSearchResult } from 'kazagumo';
-import { AlyaEmbed } from '../../utils/embed';
+import { CustomEmbed } from '../../utils/embed';
 import { Colors } from 'discord.js';
 import config from '../../config';
 import { AlyaCommand } from '../../lib/command';
@@ -108,13 +108,13 @@ export class UserCommand extends AlyaCommand {
     }
 
     private createPlaylistEmbed(playlistName: string, author: string, image: string) {
-        return new AlyaEmbed(`Added playlist **${playlistName}** to the queue.`)
+        return new CustomEmbed(`Added playlist **${playlistName}** to the queue.`)
             .setColor(Colors.White)
             .setAuthor({ name: author, iconURL: image });
     }
 
     private createTrackEmbed(title: string, trackAuthor: string, url: string, author: string, image: string) {
-        return new AlyaEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`)
+        return new CustomEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`)
             .setAuthor({ name: author, iconURL: image });
     }
 }
