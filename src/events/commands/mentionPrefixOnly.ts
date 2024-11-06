@@ -5,6 +5,7 @@ import type { Message } from 'discord.js';
 export class MentionEvent extends Event<typeof Events.MentionPrefixOnly> {
 	public override async run(message: Message) {
 		const prefix = this.container.client.options.defaultPrefix;
-		return message.channel.send(prefix ? `My prefix in this guild is: \`${prefix}\`` : 'Cannot find any Prefix for Message Commands.');
+		if (message.channel.isSendable()) message.reply(prefix ? `My prefix in this guild is: \`${prefix}\`` : 'Cannot find any Prefix for Message Commands.');
+		return;
 	}
 }

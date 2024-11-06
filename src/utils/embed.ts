@@ -1,7 +1,7 @@
 import { Colors, EmbedBuilder } from 'discord.js';
 import config from '../config';
 
-export class AlyaEmbed extends EmbedBuilder {
+export class CustomEmbed extends EmbedBuilder {
     constructor(description: string) {
         super();
         this.setColor(Colors.White)
