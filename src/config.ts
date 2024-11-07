@@ -17,7 +17,7 @@ const config: ConfigType = {
         name: envParseString('LAVALINK_NAME'),
         url: envParseString('LAVALINK_URL'),
         auth: envParseString('LAVALINK_AUTH'),
-        secure: false
+        secure: envParseString('LAVALINK_SECURE') || true
     }],
     icons: {
         bot: 'https://i.imgur.com/MmPlPMF.gif',
