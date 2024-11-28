@@ -3,7 +3,7 @@ import { Command } from '#lib/structures';
 
 export default new Command({
     type: CommandType.ChatInput,
-    description: 'Autoplaying new music!',
+    description: 'Toggle autoplay mode for the music player.',
     aliases: ['ap'],
 
     async commandRun(interaction) {
@@ -26,35 +26,10 @@ export default new Command({
                 });
             }
 
-            try {
-                const data = `https://www.youtube.com/watch?v=${player.previousTrack?.info?.identifier || player.currentTrack?.info?.identifier}&list=RD${player.previousTrack?.info.identifier || player.currentTrack?.info.identifier}`;
+            player.isAutoPlay = !player.isAutoPlay;
+            const state = player.isAutoPlay ? 'enabled' : 'disabled';
 
-                const response = await player.poru.resolve({
-                    query: data,
-                    requester: player.previousTrack?.info?.requester ?? player.currentTrack?.info?.requester,
-                    source: player.previousTrack?.info?.sourceName ?? player.currentTrack?.info?.sourceName ?? player.poru.options?.defaultPlatform ?? "ytmsearch",
-                });
-
-                if (!response || !response.tracks || ["error", "empty"].includes(response.loadType)) {
-                    return await player.skip();
-                }
-
-                response.tracks.shift();
-
-                const track = response.tracks[Math.floor(Math.random() * response.tracks.length)];
-                player.queue.push(track);
-
-                if (!player.isPlaying) {
-                    await player.play();
-                }
-
-                player.isAutoPlay = true;
-
-                return interaction.reply('<a:DancingChristmasPepe:1311733132285837373>');
-            } catch (e) {
-                console.error('Error while resolving tracks:', e);
-                return await player.skip();
-            }
+            return interaction.reply(`<a:DancingChristmasPepe:1311733132285837373> **${state}**.`);
         } catch (error) {
             console.error('Error in commandRun:', error);
             return interaction.reply({
@@ -77,39 +52,14 @@ export default new Command({
                 return message.channel.send('There is no active player for this server.');
             }
 
-            // Autoplay logic
-            try {
-                const data = `https://www.youtube.com/watch?v=${player.previousTrack?.info?.identifier || player.currentTrack?.info?.identifier}&list=RD${player.previousTrack?.info.identifier || player.currentTrack?.info.identifier}`;
+            // Toggle isAutoPlay
+            player.isAutoPlay = !player.isAutoPlay;
+            const state = player.isAutoPlay ? 'enabled' : 'disabled';
 
-                const response = await player.poru.resolve({
-                    query: data,
-                    requester: player.previousTrack?.info?.requester ?? player.currentTrack?.info?.requester,
-                    source: player.previousTrack?.info?.sourceName ?? player.currentTrack?.info?.sourceName ?? player.poru.options?.defaultPlatform ?? "ytmsearch",
-                });
-
-                if (!response || !response.tracks || ["error", "empty"].includes(response.loadType)) {
-                    return await player.skip();
-                }
-
-                response.tracks.shift();
-
-                const track = response.tracks[Math.floor(Math.random() * response.tracks.length)];
-                player.queue.push(track);
-
-                if (!player.isPlaying) {
-                    await player.play();
-                }
-
-                player.isAutoPlay = true;
-
-                return message.reply('<a:DancingChristmasPepe:1311733132285837373>');
-            } catch (e) {
-                console.error('Error while resolving tracks:', e);
-                return await player.skip();
-            }
+            return message.channel.send(`<a:DancingChristmasPepe:1311733132285837373> **${state}**.`);
         } catch (error) {
             console.error('Error in messageRun:', error);
-            return message.reply('An error occurred while executing the command. Please try again later.');
+            return message.channel.send('An error occurred while executing the command. Please try again later.');
         }
     },
 });

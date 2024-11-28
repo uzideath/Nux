@@ -30,7 +30,7 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		});
 
 		this.logger.setLevel(LogLevel.Debug);
-		this.prefixes = ['!'];
+		this.prefixes = ['.'];
 		this.ownerIds = [''];
 		this.restDebug = false;
 
@@ -76,40 +76,23 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 
 		this.poru.on('queueEnd', async (player) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			channel?.send('The queue has ended.');
-
-			try {
+			if (!player.isAutoPlay) {
+				channel?.send('The queue has ended.');
+			} else {
 				if (player.isAutoPlay) {
-					const data = `https://www.youtube.com/watch?v=${player.previousTrack?.info?.identifier || player.currentTrack?.info?.identifier}&list=RD${player.previousTrack?.info.identifier || player.currentTrack?.info.identifier}`;
-
-					const response = await player.poru.resolve({
-						query: data,
-						requester: player.previousTrack?.info?.requester ?? player.currentTrack?.info?.requester,
-						source: player.previousTrack?.info?.sourceName ?? player.currentTrack?.info?.sourceName ?? player.poru.options?.defaultPlatform ?? "ytmsearch",
-					});
-
-					if (!response || !response.tracks || ["error", "empty"].includes(response.loadType)) {
-						channel?.send('No tracks found for autoplay. The player will be idle.');
-						return;
-					}
-
-					response.tracks.shift();
-
-					const track = response.tracks[Math.floor(Math.random() * response.tracks.length)];
-					player.queue.push(track);
-					channel?.send(`Autoplay added a new track: \`${track.info.title}\``);
-
-					if (!player.isPlaying) {
-						await player.play();
-						channel?.send(`Now playing: \`${track.info.title}\``);
+					try {
+						while (player.isAutoPlay) {
+							await player.autoplay();
+							await new Promise((resolve) => this.poru.once('trackEnd', resolve));
+						}
+					} catch (err) {
+						console.error('Error handling queue end autoplay:', err);
+						channel?.send('An error occurred while attempting to autoplay a new track.');
 					}
 				}
-			} catch (err) {
-				console.error('Error handling queue end autoplay:', err);
-				channel?.send('An error occurred while attempting to autoplay a new track.');
 			}
-		});
 
+		});
 
 		this.poru.on('nodeDisconnect', (node) => {
 			this.logger.warn(`Node ${node.name} has been disconnected.`)
