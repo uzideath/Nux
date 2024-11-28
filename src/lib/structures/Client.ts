@@ -70,8 +70,8 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		});
 
 		this.poru.on('trackEnd', (player, track) => {
-			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			channel?.send(`Finished playing \`${track.info.title}\``);
+			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			// channel?.send(`Finished playing \`${track.info.title}\``);
 		});
 
 		this.poru.on('queueEnd', async (player) => {

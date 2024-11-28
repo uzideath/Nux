@@ -102,14 +102,14 @@ export default new Command({
 
                 player.isAutoPlay = true;
 
-                return message.channel.send('<a:DancingChristmasPepe:1311733132285837373>');
+                return message.reply('<a:DancingChristmasPepe:1311733132285837373>');
             } catch (e) {
                 console.error('Error while resolving tracks:', e);
                 return await player.skip();
             }
         } catch (error) {
             console.error('Error in messageRun:', error);
-            return message.channel.send('An error occurred while executing the command. Please try again later.');
+            return message.reply('An error occurred while executing the command. Please try again later.');
         }
     },
 });

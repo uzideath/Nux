@@ -2,44 +2,68 @@ import { CommandType } from '#lib/enums';
 import { Command } from '#lib/structures';
 
 export default new Command({
-    type: CommandType.ChatInput,
-    description: 'Stop the current queue from playing.',
+		type: CommandType.ChatInput,
+		description: 'Stop the current queue from playing.',
 
-    async commandRun(interaction) {
-        const member = await interaction.guild?.members.fetch(interaction.user.id);
-        const voiceChannel = member?.voice.channel?.id;
-        if (!voiceChannel) {
-            return interaction.reply({
-                content: 'You need to be in a voice channel to use this command.',
-                ephemeral: true,
-            });
-        }
+		async commandRun(interaction) {
+				try {
+						const member = await interaction.guild?.members.fetch(interaction.user.id);
+						const voiceChannel = member?.voice.channel?.id;
 
-        const { client } = interaction;
-        const poru = client.poru;
+						if (!voiceChannel) {
+								return interaction.reply({
+										content: 'You need to be in a voice channel to use this command.',
+										ephemeral: true,
+								});
+						}
 
-        let player = poru.players.get(interaction.guild!.id);
-        if (player) {
-            player.destroy();
-        }
+						const { client } = interaction;
+						const poru = client.poru;
 
-        return await interaction.reply(`<a:pepehi:1311716419620044930>`);
-    },
+						const player = poru.players.get(interaction.guild!.id);
 
-    async messageRun(message) {
-        const voiceChannel = message.member?.voice.channel;
-        if (!voiceChannel) {
-            return message.channel.send('You need to be in a voice channel to use this command.');
-        }
+						if (!player) {
+								return interaction.reply({
+										content: 'There is no active player for this server.',
+										ephemeral: true,
+								});
+						}
 
-        const poru = message.client.poru;
-        const player = poru.players.get(message.guild!.id);
+						player.destroy();
 
-        if (player) {
-            player.destroy();
-            return message.reply(`<a:pepehi:1311716419620044930>`);
-        } else {
-            return message.channel.send('There is no active player for this server.');
-        }
-    },
+						return interaction.reply({
+								content: 'The player has been stopped and the queue has been cleared. <a:pepehi:1311716419620044930>',
+						});
+				} catch (error) {
+						console.error('Error in commandRun:', error);
+						return interaction.reply({
+								content: 'An error occurred while processing the command. Please try again later.',
+								ephemeral: true,
+						});
+				}
+		},
+
+		async messageRun(message) {
+				try {
+						const voiceChannel = message.member?.voice.channel;
+
+						if (!voiceChannel) {
+								return message.channel.send('You need to be in a voice channel to use this command.');
+						}
+
+						const poru = message.client.poru;
+						const player = poru.players.get(message.guild!.id);
+
+						if (!player) {
+								return message.channel.send('There is no active player for this server.');
+						}
+
+						player.destroy();
+
+						return message.reply('The player has been stopped and the queue has been cleared. <a:pepehi:1311716419620044930>');
+				} catch (error) {
+						console.error('Error in messageRun:', error);
+						return message.channel.send('An error occurred while processing the command. Please try again later.');
+				}
+		},
 });

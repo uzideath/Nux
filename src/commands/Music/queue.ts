@@ -7,116 +7,130 @@ export default new Command({
     description: 'Displays the current queue of songs with pagination.',
 
     async commandRun(interaction) {
-        const member = await interaction.guild?.members.fetch(interaction.user.id);
-        const voiceChannel = member?.voice.channel?.id;
-        if (!voiceChannel) {
-            return interaction.reply({
-                content: 'You need to be in a voice channel to use this command.',
-                ephemeral: true,
-            });
-        }
+        try {
+            const member = await interaction.guild?.members.fetch(interaction.user.id);
+            const voiceChannel = member?.voice.channel?.id;
 
-        const { client } = interaction;
-        const poru = client.poru;
+            if (!voiceChannel) {
+                return interaction.reply({
+                    content: 'You need to be in a voice channel to use this command.',
+                    ephemeral: true,
+                });
+            }
 
-        const player = poru.players.get(interaction.guild!.id);
-        if (!player) {
-            return interaction.reply({
-                content: 'There is no active player in this server.',
-                ephemeral: true,
-            });
-        }
+            const { client } = interaction;
+            const poru = client.poru;
 
-        const currentTrack = player.currentTrack;
-        const queueTracks = player.queue;
+            const player = poru.players.get(interaction.guild!.id);
+            if (!player) {
+                return interaction.reply({
+                    content: 'There is no active player in this server.',
+                    ephemeral: true,
+                });
+            }
 
-        if (!currentTrack && !queueTracks.length) {
-            return interaction.reply({
-                content: 'The queue is currently empty.',
-                ephemeral: true,
-            });
-        }
+            const currentTrack = player.currentTrack;
+            const queueTracks = player.queue;
 
-        const tracks = queueTracks.map(
-            (track, index) =>
-                `\`${index + 1}\` ➡️ **${track.info.title}** - ${track.info.requester.tag}`
-        );
+            if (!currentTrack && !queueTracks.length) {
+                return interaction.reply({
+                    content: 'The queue is currently empty.',
+                    ephemeral: true,
+                });
+            }
 
-        const chunkSize = 10;
-        const pages = [];
-
-        for (let i = 0; i < tracks.length; i += chunkSize) {
-            const chunk = tracks.slice(i, i + chunkSize);
-            pages.push(
-                new EmbedBuilder()
-                    .setAuthor({
-                        name: `Now Playing: ${currentTrack?.info.title || 'Nothing'}`,
-                        iconURL: 'https://cdn3.emoji.gg/emojis/71921-headphones.gif',
-                    })
-                    .setDescription(chunk.join('\n'))
-                    .setFooter({ text: `Page ${Math.ceil((i + 1) / chunkSize)}/${Math.ceil(tracks.length / chunkSize)}` })
-                    .setColor('Random')
+            const tracks = queueTracks.map(
+                (track, index) =>
+                    `\`${index + 1}\` ➡️ **${track.info.title}** - ${track.info.requester.tag}`
             );
-        }
 
-        if (pages.length === 0) {
+            const chunkSize = 10;
+            const pages = [];
+
+            for (let i = 0; i < tracks.length; i += chunkSize) {
+                const chunk = tracks.slice(i, i + chunkSize);
+                pages.push(
+                    new EmbedBuilder()
+                        .setAuthor({
+                            name: `Now Playing: ${currentTrack?.info.title || 'Nothing'}`,
+                            iconURL: 'https://cdn3.emoji.gg/emojis/71921-headphones.gif',
+                        })
+                        .setDescription(chunk.join('\n'))
+                        .setFooter({ text: `Page ${Math.ceil((i + 1) / chunkSize)}/${Math.ceil(tracks.length / chunkSize)}` })
+                        .setColor('Random')
+                );
+            }
+
+            if (pages.length === 0) {
+                return interaction.reply({
+                    content: 'There are no songs in the queue to display.',
+                    ephemeral: true,
+                });
+            }
+
+            const paginator = new Paginator({ embeds: pages, ephemeral: false });
+            return paginator.run(interaction);
+        } catch (error) {
+            console.error('Error in commandRun:', error);
             return interaction.reply({
-                content: 'There are no songs in the queue to display.',
+                content: 'An error occurred while processing the command. Please try again later.',
                 ephemeral: true,
             });
         }
-
-        const paginator = new Paginator({ embeds: pages, ephemeral: false });
-        return paginator.run(interaction);
     },
 
     async messageRun(message) {
-        const voiceChannel = message.member?.voice.channel;
-        if (!voiceChannel) {
-            return message.channel.send('You need to be in a voice channel to use this command.');
-        }
+        try {
+            const voiceChannel = message.member?.voice.channel;
+            if (!voiceChannel) {
+                return message.channel.send('You need to be in a voice channel to use this command.');
+            }
 
-        const poru = message.client.poru;
-        const player = poru.players.get(message.guild!.id);
+            const poru = message.client.poru;
+            const player = poru.players.get(message.guild!.id);
 
-        if (!player) {
-            return message.channel.send('There is no active player in this server.');
-        }
+            if (!player) {
+                return message.channel.send('There is no active player in this server.');
+            }
 
-        const currentTrack = player.currentTrack;
-        const queueTracks = player.queue;
+            const currentTrack = player.currentTrack;
+            const queueTracks = player.queue;
 
-        if (!currentTrack && !queueTracks.length) {
-            return message.channel.send('The queue is currently empty.');
-        }
+            if (!currentTrack && !queueTracks.length) {
+                return message.channel.send('The queue is currently empty.');
+            }
 
-        const tracks = queueTracks.map(
-            (track, index) =>
-                `\`${index + 1}\` <a:Animated_Arrow_White:1311721526739079280> **${track.info.title}** - \`${track.info.requester.displayName}\``
-        );
-
-        const chunkSize = 10;
-        const pages = [];
-
-        for (let i = 0; i < tracks.length; i += chunkSize) {
-            const chunk = tracks.slice(i, i + chunkSize);
-            pages.push(
-                new EmbedBuilder()
-                    .setAuthor({
-                        name: `${currentTrack?.info.title || 'Nothing'} - ${currentTrack?.info.author || 'Unknown'}`,
-                        iconURL: 'https://cdn3.emoji.gg/emojis/71921-headphones.gif',
-                    })
-                    .setDescription(chunk.join('\n'))
-                    .setFooter({ text: `Page ${Math.ceil((i + 1) / chunkSize)}/${Math.ceil(tracks.length / chunkSize)}` })
-                    .setColor('Random')
+            const tracks = queueTracks.map(
+                (track, index) =>
+                    `\`${index + 1}\` <a:Animated_Arrow_White:1311721526739079280> **${track.info.title}** - \`${track.info.requester.displayName}\``
             );
-        }
 
-        if (pages.length === 0) {
-            return message.channel.send('There are no songs in the queue to display.');
-        }
+            const chunkSize = 10;
+            const pages = [];
 
-        const paginator = new Paginator({ embeds: pages });
-        return paginator.run(message);
+            for (let i = 0; i < tracks.length; i += chunkSize) {
+                const chunk = tracks.slice(i, i + chunkSize);
+                pages.push(
+                    new EmbedBuilder()
+                        .setAuthor({
+                            name: `${currentTrack?.info.title || 'Nothing'} - ${currentTrack?.info.author || 'Unknown'}`,
+                            iconURL: 'https://cdn3.emoji.gg/emojis/71921-headphones.gif',
+                        })
+                        .setDescription(chunk.join('\n'))
+                        .setFooter({ text: `Page ${Math.ceil((i + 1) / chunkSize)}/${Math.ceil(tracks.length / chunkSize)}` })
+                        .setColor('Random')
+                );
+            }
+
+            if (pages.length === 0) {
+                return message.channel.send('There are no songs in the queue to display.');
+            }
+
+            const paginator = new Paginator({ embeds: pages });
+            return paginator.run(message);
+        } catch (error) {
+            console.error('Error in messageRun:', error);
+            return message.channel.send('An error occurred while processing the command. Please try again later.');
+        }
     },
 });
