@@ -76,7 +76,7 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 
 		this.poru.on('queueEnd', async (player) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			channel?.send('The queue has ended. Searching for a new track to continue autoplay...');
+			channel?.send('The queue has ended.');
 
 			try {
 				if (player.isAutoPlay) {
