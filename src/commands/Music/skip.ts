@@ -26,8 +26,14 @@ export default new Command({
 				});
 			}
 
-			player.skip();
-
+			if (player.isAutoPlay) {
+				player.skip();
+				await player.autoplay()
+			}
+			else {
+				player.skip();
+			}
+			
 			return interaction.reply({
 				content: '👍',
 			});
