@@ -1,120 +1,161 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Command } from '@sapphire/framework';
-import { KazagumoPlayer, KazagumoSearchResult } from 'kazagumo';
-import { CustomEmbed } from '../../utils/embed';
-import { Colors } from 'discord.js';
-import config from '../../config';
-import { AlyaCommand } from '../../lib/command';
+import { CommandType } from '#lib/enums';
+import { Command } from '#lib/structures';
+import { ApplicationCommandOptionType } from 'discord.js';
 
-@ApplyOptions<Command.Options>({
-    description: 'Play a song or playlist from search'
-})
-export class UserCommand extends AlyaCommand {
-    public override registerApplicationCommands(registry: Command.Registry) {
-        registry.registerChatInputCommand((builder) =>
-            builder
-                .setName(this.name)
-                .setDescription(this.description)
-                .addStringOption((option) =>
-                    option
-                        .setName('query')
-                        .setDescription('The song to search and play')
-                        .setRequired(true)
-                )
-        );
-    }
-
-    public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-        const query = interaction.options.getString('query', true);
-        const member = await interaction.guild?.members.fetch(interaction.user.id);
-
-        await interaction.deferReply();
-
-        if (!member?.voice.channel) {
-            return this.Error(interaction, 'You must be in a voice channel to use this command.');
+export default new Command({
+    type: CommandType.ChatInput,
+    description: 'Play a track in your voice channel!',
+    options: [
+        {
+            name: 'track',
+            description: 'The name or URL of the track to play.',
+            type: ApplicationCommandOptionType.String,
+            required: true,
+        },
+    ],
+    async commandRun(interaction) {
+        const member = await interaction.guild?.members.fetch(interaction.user.id)
+        const voiceChannel = member?.voice.channel?.id
+        if (!voiceChannel) {
+            return interaction.reply({
+                content: 'You need to be in a voice channel to use this command.',
+                ephemeral: true,
+            });
         }
 
-        const { author, image, engine } = this.getSourceInfo(query);
+        const trackQuery = interaction.options.getString('track', true);
 
-        let player: KazagumoPlayer;
-        try {
-            player = await this.createPlayer(interaction.guildId!, interaction.channel?.id!, member.voice.channelId!);
-        } catch (error) {
-            console.error('Error creating the player:', error);
-            return this.Error(interaction, 'There was an error creating the player.');
-        }
+        const { client } = interaction;
+        const poru = client.poru;
 
-        let result: KazagumoSearchResult;
-        try {
-            result = await this.searchTrack(query, interaction.user.displayName, engine);
-        } catch (error) {
-            console.error('Error searching for the song:', error);
-            return this.Error(interaction, 'There was an error searching for the song.');
-        }
-
-        if (!result.tracks.length) {
-            return this.Error(interaction, 'No results were found.');
-        }
-
-        return await this.handleSearchResult(result, player, author, image, interaction);
-    }
-
-    private getSourceInfo(query: string) {
-        if (query.includes('youtube.com') || query.includes('youtu.be')) {
-            return { author: 'YouTube', image: config.icons.youtube, engine: 'youtube' };
-        } else if (query.includes('spotify.com')) {
-            return { author: 'Spotify', image: config.icons.spotify, engine: 'spotify' };
-        }
-        return { author: 'Youtube', image: config.icons.youtube, engine: 'youtube' };
-    }
-
-    private async createPlayer(guildId: string, textId: string | undefined, voiceId: string) {
-        return await this.container.kazagumo.createPlayer({
-            guildId,
-            textId: textId!,
-            voiceId,
-            volume: 100,
-            deaf: true
+        const res = await poru.resolve({
+            query: trackQuery,
+            source: 'ytsearch', 
+            requester: interaction.user,
         });
-    }
 
-    private async searchTrack(query: string, requester: string, engine: string) {
-        return await this.container.kazagumo.search(query, { requester, engine });
-    }
-
-    private async handleSearchResult(result: KazagumoSearchResult, player: KazagumoPlayer, author: string, image: string, interaction: Command.ChatInputCommandInteraction) {
-        try {
-            if (result.type === 'PLAYLIST') {
-                result.tracks.forEach(track => player.queue.add(track));
-                const embed = this.createPlaylistEmbed(result.playlistName!, author, image);
-                await interaction.editReply({ content: '', embeds: [embed] });
-            } else {
-                const track = result.tracks[0];
-                player.queue.add(track);
-                const embed = this.createTrackEmbed(track.title, track.author!, track.uri!, author, image);
-                await interaction.editReply({ content: '', embeds: [embed] });
-            }
-
-            if (!player.playing && !player.paused) {
-                player.play().catch(error => {
-                    console.error('Error playing the track:', error);
-                    this.Error(interaction, 'There was an error playing the track.');
-                });
-            }
-        } catch (error) {
-            console.error('Error handling search result:', error);
-            this.Error(interaction, 'There was an error handling the search result.');
+        if (res.loadType === 'error') {
+            return interaction.reply({
+                content: 'There was an error loading the track.',
+                ephemeral: true,
+            });
         }
-    }
 
-    private createPlaylistEmbed(playlistName: string, author: string, image: string) {
-        return new CustomEmbed(`Added playlist **${playlistName}** to the queue.`)
-            .setColor(Colors.White)
-            .setAuthor({ name: author, iconURL: image });
-    }
+        if (res.loadType === 'empty') {
+            return interaction.reply({
+                content: 'No tracks found for your query.',
+                ephemeral: true,
+            });
+        }
 
-    private createTrackEmbed(title: string, trackAuthor: string, url: string, author: string, image: string) {
-        return new CustomEmbed(`Added [**${title}** by **${trackAuthor}**](${url}) to the queue.`)
-            .setAuthor({ name: author, iconURL: image });
-    }
-}
+        let player = poru.players.get(interaction.guild!.id);
+        if (!player) {
+            player = poru.createConnection({
+                guildId: interaction.guild!.id,
+                voiceChannel: voiceChannel,
+                textChannel: interaction.channel!.id,
+                deaf: true,
+            });
+        }
+
+        if (res.loadType === 'playlist') {
+            for (const track of res.tracks) {
+                track.info.requester = interaction.user;
+                player.queue.add(track);
+            }
+
+            interaction.reply({
+                content: `Playlist \`${res.playlistInfo.name}\` loaded with ${res.tracks.length} tracks.`,
+            });
+        } else {
+            const track = res.tracks[0];
+            track.info.requester = interaction.user;
+            player.queue.add(track);
+
+            interaction.reply({
+                content: `Queued: \`${track.info.title}\`.`,
+            });
+        }
+
+        // Play if the player is not already playing
+        if (!player.isPlaying && !player.isPaused) {
+            player.play();
+        }
+    },
+
+    async messageRun(message) {
+        const args = message.content.split(' ').slice(1);
+        if (!args.length) {
+            return message.channel.send('Please provide the name or URL of the track to play.');
+        }
+
+        const trackQuery = args.join(' ');
+
+        const voiceChannel = message.member?.voice.channel;
+        if (!voiceChannel) {
+            return message.channel.send('You need to be in a voice channel to use this command.');
+        }
+
+        const poru = message.client.poru;
+
+        const res = await poru.resolve({
+            query: trackQuery,
+            source: 'ytsearch', // Change this source if needed
+            requester: message.author,
+        });
+
+        if (res.loadType === 'error') {
+            return message.channel.send('There was an error loading the track.');
+        }
+
+        if (res.loadType === 'empty') {
+            return message.channel.send('No tracks found for your query.');
+        }
+
+        let player = poru.players.get(message.guild!.id);
+        if (!player) {
+            player = poru.createConnection({
+                guildId: message.guild!.id,
+                voiceChannel: voiceChannel.id,
+                textChannel: message.channel.id,
+                deaf: true,
+            });
+        }
+
+        if (res.loadType === 'playlist') {
+            for (const track of res.tracks) {
+                track.info.requester = message.author;
+                player.queue.add(track);
+            }
+
+            message.channel.send(
+                `Playlist \`${res.playlistInfo.name}\` loaded with ${res.tracks.length} tracks.`
+            );
+        } else {
+            const track = res.tracks[0];
+            track.info.requester = message.author;
+            player.queue.add(track);
+
+            message.channel.send(`Queued: \`${track.info.title}\`.`);
+        }
+
+        if (!player.isPlaying && !player.isPaused) {
+            player.play();
+        }
+    },
+
+    async autoCompleteRun(interaction) {
+        const focus = interaction.options.getFocused();
+        // Example: Provide autocomplete suggestions based on some predefined tracks or queries
+        const choices = ['Track 1', 'Track 2', 'Track 3'];
+        const filtered = choices.filter((choice) =>
+            choice.toLowerCase().startsWith(focus.toLowerCase())
+        );
+        return interaction.respond(
+            filtered.map((choice) => ({
+                name: choice,
+                value: choice,
+            }))
+        );
+    },
+});

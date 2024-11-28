@@ -3,14 +3,13 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "Node",
-		"baseUrl": "./src",
+		"baseUrl": ".",
 		"paths": {
 			"#lib/*": ["lib/*"],
 			"#core": ["core/index.ts"],
 			"#root/*": ["*"]
 		},
 		"rootDir": ".",
-    "outDir": "dist",
 		"allowJs": true,
 		"noEmit": true,
 		"strict": true,
