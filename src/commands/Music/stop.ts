@@ -32,7 +32,7 @@ export default new Command({
 						player.destroy();
 
 						return interaction.reply({
-								content: 'The player has been stopped and the queue has been cleared. <a:pepehi:1311716419620044930>',
+								content: '<a:pepehi:1311716419620044930>',
 						});
 				} catch (error) {
 						console.error('Error in commandRun:', error);
@@ -60,7 +60,7 @@ export default new Command({
 
 						player.destroy();
 
-						return message.reply('The player has been stopped and the queue has been cleared. <a:pepehi:1311716419620044930>');
+						return message.reply('<a:pepehi:1311716419620044930>');
 				} catch (error) {
 						console.error('Error in messageRun:', error);
 						return message.channel.send('An error occurred while processing the command. Please try again later.');
