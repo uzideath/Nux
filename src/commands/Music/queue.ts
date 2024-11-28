@@ -44,18 +44,26 @@ export default new Command({
 
         const chunkSize = 10;
         const pages = [];
+
         for (let i = 0; i < tracks.length; i += chunkSize) {
             const chunk = tracks.slice(i, i + chunkSize);
             pages.push(
                 new EmbedBuilder()
                     .setAuthor({
-                        name: `Now Playing: ${currentTrack?.info.title}`,
+                        name: `Now Playing: ${currentTrack?.info.title || 'Nothing'}`,
                         iconURL: 'https://cdn3.emoji.gg/emojis/71921-headphones.gif',
                     })
-                    .setDescription(chunk.join('\n') || 'No songs in the queue.')
+                    .setDescription(chunk.join('\n'))
                     .setFooter({ text: `Page ${Math.ceil((i + 1) / chunkSize)}/${Math.ceil(tracks.length / chunkSize)}` })
                     .setColor('Random')
             );
+        }
+
+        if (pages.length === 0) {
+            return interaction.reply({
+                content: 'There are no songs in the queue to display.',
+                ephemeral: true,
+            });
         }
 
         const paginator = new Paginator({ embeds: pages, ephemeral: false });
@@ -89,18 +97,23 @@ export default new Command({
 
         const chunkSize = 10;
         const pages = [];
+
         for (let i = 0; i < tracks.length; i += chunkSize) {
             const chunk = tracks.slice(i, i + chunkSize);
             pages.push(
                 new EmbedBuilder()
                     .setAuthor({
-                        name: `${currentTrack?.info.title} - ${currentTrack?.info.author}`,
+                        name: `${currentTrack?.info.title || 'Nothing'} - ${currentTrack?.info.author || 'Unknown'}`,
                         iconURL: 'https://cdn3.emoji.gg/emojis/71921-headphones.gif',
                     })
-                    .setDescription(chunk.join('\n') || 'No songs in the queue.')
+                    .setDescription(chunk.join('\n'))
                     .setFooter({ text: `Page ${Math.ceil((i + 1) / chunkSize)}/${Math.ceil(tracks.length / chunkSize)}` })
                     .setColor('Random')
             );
+        }
+
+        if (pages.length === 0) {
+            return message.channel.send('There are no songs in the queue to display.');
         }
 
         const paginator = new Paginator({ embeds: pages });

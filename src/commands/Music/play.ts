@@ -65,7 +65,7 @@ export default new Command({
             }
 
             interaction.editReply({
-                content: `Playlist \`${res.playlistInfo.name}\` loaded with ${res.tracks.length} tracks.`,
+                content: `Playlist \`${res.playlistInfo.name}\` loaded with \`${res.tracks.length}\` tracks.`,
             });
         } else {
             const track = res.tracks[0];

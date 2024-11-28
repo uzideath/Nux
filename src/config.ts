@@ -4,7 +4,7 @@ const config: ConfigType = {
     nodes:
         [
             {
-                name: "local-node",
+                name: process.env.LAVALINK_NAME || "self",
                 host: process.env.LAVALINK_HOST,
                 port: Number(process.env.LAVALINK_PORT),
                 password: process.env.LAVALINK_PASSWORD,
@@ -13,7 +13,7 @@ const config: ConfigType = {
     options:
     {
         library: "discord.js",
-        defaultPlatform: "scsearch",
+        defaultPlatform: "ytsearch",
     }
 }
 

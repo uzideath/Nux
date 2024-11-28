@@ -19,27 +19,24 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 			],
 			partials: [Partials.Channel],
 			presence: {
-				status: 'dnd', // ! Set your bot's status (online, dnd, idle, invisible)
+				status: 'dnd',
 				activities: [
 					{
-						name: '/play', // ! Set your bot's activity
-						type: ActivityType.Watching,
+						name: '/play',
+						type: ActivityType.Listening,
 					},
 				],
 			},
 		});
 
 		this.logger.setLevel(LogLevel.Debug);
-		this.prefixes = ['q!', '!']; //! Set your preferable prefix
-		this.ownerIds = ['917620752453369896']; //! Set your Discord User ID
-		this.restDebug = false; //! Set this to true if you want to see REST logs
+		this.prefixes = ['!'];
+		this.ownerIds = [''];
+		this.restDebug = false;
 
 		this.poru = new Poru(this, config.nodes, config.options)
 
-		this.poru.on("trackStart", (player, track) => {
-			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			return channel.send(`Now playing \`${track.info.title}\``);
-		});
+		this.registerPoruEvents();
 	}
 
 	public prefixes: string[] = [];
@@ -65,6 +62,61 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		});
 
 		return promiseString;
+	}
+	private registerPoruEvents() {
+		this.poru.on('trackStart', (player, track) => {
+			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			channel?.send(`Now playing \`${track.info.title}\``);
+		});
+
+		this.poru.on('trackEnd', (player, track) => {
+			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			channel?.send(`Finished playing \`${track.info.title}\``);
+		});
+
+		this.poru.on('queueEnd', (player) => {
+			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			channel?.send('The queue has ended.');
+		});
+
+		this.poru.on('nodeDisconnect', (node) => {
+			this.logger.warn(`Node ${node.name} has been disconnected.`)
+		});
+
+		this.poru.on('nodeError', (node, error) => {
+			this.logger.warn(`Node ${node.name} just fired an error ${error}.`)
+		});
+
+		this.poru.on('trackError', (player, track, error) => {
+			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			console.error(`Track exception for ${track.info.title}: ${error}`);
+			channel?.send(
+				`An error occurred while playing \`${track.info.title}\`: ${error}. Skipping...`
+			);
+			player.destroy();
+		});
+
+		this.poru.on('playerCreate', (player) => {
+			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			// channel?.send('Player successfully connected.');
+			this.logger.info(`A new player was created on ${player.guildId}`)
+		});
+
+		this.poru.on('nodeConnect', (node) => {
+			this.logger.debug(`Node ${node.name} connected successfully.`);
+		});
+
+		this.poru.on('nodeDisconnect', (node, reason) => {
+			this.logger.warn(`Node ${node.name} disconnected. Reason: ${reason}`);
+		});
+
+		this.poru.on('nodeError', (node, error) => {
+			this.logger.error(`Node ${node.name} encountered an error: ${error.message}`);
+		});
+
+		this.poru.on('nodeReconnect', (node) => {
+			this.logger.info(`Node ${node.name} is reconnecting...`);
+		});
 	}
 }
 
