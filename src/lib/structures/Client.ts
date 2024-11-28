@@ -74,10 +74,42 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 			channel?.send(`Finished playing \`${track.info.title}\``);
 		});
 
-		this.poru.on('queueEnd', (player) => {
+		this.poru.on('queueEnd', async (player) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			channel?.send('The queue has ended.');
+			channel?.send('The queue has ended. Searching for a new track to continue autoplay...');
+
+			try {
+				if (player.isAutoPlay) {
+					const data = `https://www.youtube.com/watch?v=${player.previousTrack?.info?.identifier || player.currentTrack?.info?.identifier}&list=RD${player.previousTrack?.info.identifier || player.currentTrack?.info.identifier}`;
+
+					const response = await player.poru.resolve({
+						query: data,
+						requester: player.previousTrack?.info?.requester ?? player.currentTrack?.info?.requester,
+						source: player.previousTrack?.info?.sourceName ?? player.currentTrack?.info?.sourceName ?? player.poru.options?.defaultPlatform ?? "ytmsearch",
+					});
+
+					if (!response || !response.tracks || ["error", "empty"].includes(response.loadType)) {
+						channel?.send('No tracks found for autoplay. The player will be idle.');
+						return;
+					}
+
+					response.tracks.shift();
+
+					const track = response.tracks[Math.floor(Math.random() * response.tracks.length)];
+					player.queue.push(track);
+					channel?.send(`Autoplay added a new track: \`${track.info.title}\``);
+
+					if (!player.isPlaying) {
+						await player.play();
+						channel?.send(`Now playing: \`${track.info.title}\``);
+					}
+				}
+			} catch (err) {
+				console.error('Error handling queue end autoplay:', err);
+				channel?.send('An error occurred while attempting to autoplay a new track.');
+			}
 		});
+
 
 		this.poru.on('nodeDisconnect', (node) => {
 			this.logger.warn(`Node ${node.name} has been disconnected.`)
@@ -102,6 +134,18 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 			this.logger.info(`A new player was created on ${player.guildId}`)
 		});
 
+		this.poru.on('playerDestroy', (player) => {
+			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			// channel?.send('Player successfully connected.');
+			this.logger.info(`A new player was destroyed on ${player.guildId}`)
+		});
+
+
+		this.poru.on('playerUpdate', (player) => {
+			this.logger.info(`Player updated in guild: ${player.guildId}`);
+		});
+
+
 		this.poru.on('nodeConnect', (node) => {
 			this.logger.debug(`Node ${node.name} connected successfully.`);
 		});
@@ -118,6 +162,7 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 			this.logger.info(`Node ${node.name} is reconnecting...`);
 		});
 	}
+
 }
 
 declare module 'discord.js' {
