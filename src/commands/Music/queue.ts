@@ -5,6 +5,7 @@ import { EmbedBuilder } from 'discord.js';
 export default new Command({
     type: CommandType.ChatInput,
     description: 'Displays the current queue of songs with pagination.',
+    aliases: ['q'],
 
     async commandRun(interaction) {
         try {

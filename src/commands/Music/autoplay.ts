@@ -52,7 +52,6 @@ export default new Command({
                 return message.channel.send('There is no active player for this server.');
             }
 
-            // Toggle isAutoPlay
             player.isAutoPlay = !player.isAutoPlay;
             const state = player.isAutoPlay ? 'enabled' : 'disabled';
 

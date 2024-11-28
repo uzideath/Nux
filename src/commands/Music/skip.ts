@@ -4,7 +4,7 @@ import { Command } from '#lib/structures';
 export default new Command({
 	type: CommandType.ChatInput,
 	description: 'Skip to the next song in the queue!',
-
+	aliases: ['sk'],
 	async commandRun(interaction) {
 		try {
 			const member = await interaction.guild?.members.fetch(interaction.user.id);

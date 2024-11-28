@@ -75,23 +75,17 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		});
 
 		this.poru.on('queueEnd', async (player) => {
-			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			if (!player.isAutoPlay) {
-				channel?.send('The queue has ended.');
-			} else {
-				if (player.isAutoPlay) {
-					try {
-						while (player.isAutoPlay) {
-							await player.autoplay();
-							await new Promise((resolve) => this.poru.once('trackEnd', resolve));
-						}
-					} catch (err) {
-						console.error('Error handling queue end autoplay:', err);
-						channel?.send('An error occurred while attempting to autoplay a new track.');
-					}
+			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			if (player.isAutoPlay) {
+				while (player.isAutoPlay) {
+					await player.autoplay()
+					await new Promise((
+						resolve
+					) => {
+						this.poru.on('trackEnd', resolve)
+					})
 				}
 			}
-
 		});
 
 		this.poru.on('nodeDisconnect', (node) => {
