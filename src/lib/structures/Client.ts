@@ -1,7 +1,7 @@
 import { handleListener, handleRegistry, initiateCommands } from '#core';
 import { LogLevel } from '#lib/enums';
 import { Command, Listener, Logger } from '#lib/structures';
-import { Client as DJSClient, Collection, GatewayIntentBits, Partials, ActivityType } from 'discord.js';
+import { Client as DJSClient, Collection, GatewayIntentBits, Partials, ActivityType, TextChannel } from 'discord.js';
 import { cyanBright, underline } from 'colorette';
 import config from '#root/config';
 import { Poru } from 'poru';
@@ -35,6 +35,11 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		this.restDebug = false; //! Set this to true if you want to see REST logs
 
 		this.poru = new Poru(this, config.nodes, config.options)
+
+		this.poru.on("trackStart", (player, track) => {
+			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			return channel.send(`Now playing \`${track.info.title}\``);
+		});
 	}
 
 	public prefixes: string[] = [];
@@ -71,5 +76,6 @@ declare module 'discord.js' {
 		logger: Logger;
 		prefixes: string[];
 		restDebug: boolean;
+		poru: Poru;
 	}
 }

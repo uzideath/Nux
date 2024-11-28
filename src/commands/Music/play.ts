@@ -16,10 +16,12 @@ export default new Command({
     async commandRun(interaction) {
         const member = await interaction.guild?.members.fetch(interaction.user.id)
         const voiceChannel = member?.voice.channel?.id
+
+        await interaction.deferReply();
+
         if (!voiceChannel) {
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'You need to be in a voice channel to use this command.',
-                ephemeral: true,
             });
         }
 
@@ -30,21 +32,19 @@ export default new Command({
 
         const res = await poru.resolve({
             query: trackQuery,
-            source: 'ytsearch', 
+            source: 'ytsearch',
             requester: interaction.user,
         });
 
         if (res.loadType === 'error') {
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'There was an error loading the track.',
-                ephemeral: true,
             });
         }
 
         if (res.loadType === 'empty') {
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'No tracks found for your query.',
-                ephemeral: true,
             });
         }
 
@@ -64,7 +64,7 @@ export default new Command({
                 player.queue.add(track);
             }
 
-            interaction.reply({
+            interaction.editReply({
                 content: `Playlist \`${res.playlistInfo.name}\` loaded with ${res.tracks.length} tracks.`,
             });
         } else {
@@ -72,12 +72,11 @@ export default new Command({
             track.info.requester = interaction.user;
             player.queue.add(track);
 
-            interaction.reply({
+            interaction.editReply({
                 content: `Queued: \`${track.info.title}\`.`,
             });
         }
 
-        // Play if the player is not already playing
         if (!player.isPlaying && !player.isPaused) {
             player.play();
         }
@@ -100,7 +99,7 @@ export default new Command({
 
         const res = await poru.resolve({
             query: trackQuery,
-            source: 'ytsearch', // Change this source if needed
+            source: 'ytmsearch',
             requester: message.author,
         });
 
@@ -142,20 +141,5 @@ export default new Command({
         if (!player.isPlaying && !player.isPaused) {
             player.play();
         }
-    },
-
-    async autoCompleteRun(interaction) {
-        const focus = interaction.options.getFocused();
-        // Example: Provide autocomplete suggestions based on some predefined tracks or queries
-        const choices = ['Track 1', 'Track 2', 'Track 3'];
-        const filtered = choices.filter((choice) =>
-            choice.toLowerCase().startsWith(focus.toLowerCase())
-        );
-        return interaction.respond(
-            filtered.map((choice) => ({
-                name: choice,
-                value: choice,
-            }))
-        );
     },
 });
