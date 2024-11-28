@@ -14,18 +14,29 @@ const config: ConfigType = {
     {
         library: "discord.js",
         defaultPlatform: "ytsearch",
+    },
+    bot: {
+        owners: [],
+        prefix: ['!']
     }
 }
 
 
 interface Conf {
-    nodes: [{
-        name: string;
-        host: string;
-        port: number;
-        password: string;
-    }],
-    options: PoruOptions
+    nodes: [
+        {
+            name: string;
+            host: string;
+            port: number;
+            password: string;
+        }
+    ],
+    options: PoruOptions,
+
+    bot: {
+        prefix: ['!'],
+        owners: []
+    }
 }
 
 type ConfigType = Conf

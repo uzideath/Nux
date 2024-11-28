@@ -30,7 +30,7 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		});
 
 		this.logger.setLevel(LogLevel.Debug);
-		this.prefixes = ['.'];
+		this.prefixes = config.bot.prefix;
 		this.ownerIds = [''];
 		this.restDebug = false;
 
