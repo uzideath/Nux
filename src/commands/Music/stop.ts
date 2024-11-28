@@ -29,6 +29,10 @@ export default new Command({
 				});
 			}
 
+			if (player.isAutoPlay) {
+				player.isAutoPlay = false;
+			}
+
 			player.destroy();
 
 			return interaction.reply({
@@ -56,6 +60,10 @@ export default new Command({
 
 			if (!player) {
 				return message.channel.send('There is no active player for this server.');
+			}
+
+			if (player.isAutoPlay) {
+				player.isAutoPlay = false;
 			}
 
 			player.destroy();
