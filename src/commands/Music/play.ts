@@ -17,11 +17,11 @@ export default new Command({
 	async commandRun(interaction) {
 		try {
 			const member = await interaction.guild?.members.fetch(interaction.user.id);
-			const voiceChannel = member?.voice.channel?.id;
+			const userVoiceChannel = member?.voice.channel?.id;
 
 			await interaction.deferReply();
 
-			if (!voiceChannel) {
+			if (!userVoiceChannel) {
 				return interaction.editReply({
 					content: 'You need to be in a voice channel to use this command.',
 				});
@@ -50,10 +50,27 @@ export default new Command({
 			}
 
 			let player = poru.players.get(interaction.guild!.id);
+
+			if (player) {
+				if (player.voiceChannel) {
+					if (player.voiceChannel !== userVoiceChannel) {
+						return interaction.editReply({
+							content: 'I am already connected to a different voice channel.',
+						});
+					}
+				} else {
+					if (player.isAutoPlay) {
+						player.isAutoPlay = false;
+					}
+					player.destroy();
+					player = undefined;
+				}
+			}
+
 			if (!player) {
 				player = poru.createConnection({
 					guildId: interaction.guild!.id,
-					voiceChannel: voiceChannel,
+					voiceChannel: userVoiceChannel,
 					textChannel: interaction.channel!.id,
 					deaf: true,
 				});
@@ -120,6 +137,21 @@ export default new Command({
 			}
 
 			let player = poru.players.get(message.guild!.id);
+
+			if (player) {
+				if (player.voiceChannel) {
+					if (player.voiceChannel !== voiceChannel.id) {
+						return message.channel.send('I am already connected to a different voice channel.');
+					}
+				} else {
+					if (player.isAutoPlay) {
+						player.isAutoPlay = false;
+					}
+					player.destroy();
+					player = undefined;
+				}
+			}
+
 			if (!player) {
 				player = poru.createConnection({
 					guildId: message.guild!.id,

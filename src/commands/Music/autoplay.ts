@@ -27,7 +27,7 @@ export default new Command({
             }
 
             player.isAutoPlay = !player.isAutoPlay;
-            const state = player.isAutoPlay ? 'enabled' : 'disabled';
+            const state = player.isAutoPlay ? 'Enabled' : 'Disabled';
 
             return interaction.reply(`<a:DancingChristmasPepe:1311733132285837373> **${state}**.`);
         } catch (error) {
@@ -53,7 +53,7 @@ export default new Command({
             }
 
             player.isAutoPlay = !player.isAutoPlay;
-            const state = player.isAutoPlay ? 'enabled' : 'disabled';
+            const state = player.isAutoPlay ? 'Enabled' : 'Disabled';
 
             return message.channel.send(`<a:DancingChristmasPepe:1311733132285837373> **${state}**.`);
         } catch (error) {

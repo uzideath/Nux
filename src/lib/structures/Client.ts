@@ -5,6 +5,7 @@ import { Client as DJSClient, Collection, GatewayIntentBits, Partials, ActivityT
 import { cyanBright, underline } from 'colorette';
 import config from '#root/config';
 import { Poru } from 'poru';
+import { minutesToMilliseconds } from '#lib/util';
 
 export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 	public poru: Poru
@@ -77,20 +78,40 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		});
 
 		*/
-		
+
 		this.poru.on('queueEnd', async (player) => {
-			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			if (player.isAutoPlay) {
-				while (player.isAutoPlay) {
-					await player.autoplay()
-					await new Promise((
-						resolve
-					) => {
-						this.poru.on('trackEnd', resolve)
-					})
+			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
+			while (player.isAutoPlay) {
+				try {
+					await player.autoplay();
+					await new Promise((resolve) => {
+						this.poru.once('trackEnd', resolve);
+					});
+				} catch (error) {
+					console.error('Error during autoplay:', error);
+					channel?.send('An error occurred while attempting to autoplay. Stopping autoplay.');
+					break;
 				}
 			}
+
+			if (!player.isAutoPlay && !player.isPlaying) {
+				const disconnectTimer = setTimeout(() => {
+					if (!player.isAutoPlay && !player.isPlaying) {
+						player.destroy();
+						channel?.send('Been idle for 3 minutes, bandwidth does not grow on trees. Disconnecting, cya!');
+					}
+				}, minutesToMilliseconds(3));
+				const onStatusChange = () => {
+					if (player.isAutoPlay || player.isPlaying) {
+						clearTimeout(disconnectTimer);
+						this.poru.off('playerUpdate', onStatusChange);
+					}
+				};
+
+				this.poru.on('playerUpdate', onStatusChange);
+			}
 		});
+
 
 		this.poru.on('nodeDisconnect', (node) => {
 			this.logger.warn(`Node ${node.name} has been disconnected.`)
