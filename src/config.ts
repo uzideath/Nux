@@ -1,26 +1,23 @@
-import { PoruOptions } from "poru"
+import { PoruOptions } from "poru";
 
 const config: ConfigType = {
-    nodes:
-        [
-            {
-                name: process.env.LAVALINK_NAME || "self",
-                host: process.env.LAVALINK_HOST,
-                port: Number(process.env.LAVALINK_PORT),
-                password: process.env.LAVALINK_PASSWORD,
-            },
-        ],
-    options:
-    {
+    nodes: [
+        {
+            name: process.env.LAVALINK_NAME || "self",
+            host: process.env.LAVALINK_HOST || "",
+            port: Number(process.env.LAVALINK_PORT) || 2333,
+            password: process.env.LAVALINK_PASSWORD || "",
+        },
+    ],
+    options: {
         library: "discord.js",
         defaultPlatform: "ytsearch",
     },
     bot: {
         owners: [],
-        prefix: ['.']
-    }
-}
-
+        prefix: process.env.PREFIX ? process.env.PREFIX.split(",") : ['.'],
+    },
+};
 
 interface Conf {
     nodes: [
@@ -30,15 +27,14 @@ interface Conf {
             port: number;
             password: string;
         }
-    ],
-    options: PoruOptions,
-
+    ];
+    options: PoruOptions;
     bot: {
-        prefix: ['.'],
-        owners: []
-    }
+        prefix: string[];
+        owners: [];
+    };
 }
 
-type ConfigType = Conf
+type ConfigType = Conf;
 
-export default config
+export default config;
