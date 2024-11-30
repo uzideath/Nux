@@ -65,62 +65,62 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		return promiseString;
 	}
 	private registerPoruEvents() {
+		const disconnectTimers = new Map<string, NodeJS.Timeout>();
+	
 		this.poru.on('trackStart', (player, track) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
 			channel?.send(`Now playing \`${track.info.title}\``);
+	
+			if (disconnectTimers.has(player.guildId)) {
+				clearTimeout(disconnectTimers.get(player.guildId)!);
+				disconnectTimers.delete(player.guildId);
+			}
 		});
-
-		/**
-		
-		this.poru.on('trackEnd', (player, track) => {
-			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			// channel?.send(`Finished playing \`${track.info.title}\``);
-		});
-
-		*/
-
+	
 		this.poru.on('queueEnd', async (player) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			while (player.isAutoPlay) {
+	
+			if (player.isAutoPlay) {
 				try {
 					await player.autoplay();
-					await new Promise((resolve) => {
-						this.poru.once('trackEnd', resolve);
-					});
 				} catch (error) {
 					console.error('Error during autoplay:', error);
 					channel?.send('An error occurred while attempting to autoplay. Stopping autoplay.');
-					break;
 				}
+				return;
 			}
-
-			if (!player.isAutoPlay && !player.isPlaying) {
-				const disconnectTimer = setTimeout(() => {
-					if (!player.isAutoPlay && !player.isPlaying) {
+	
+			if (!player.isPlaying && player.queue.size === 0) {
+				const disconnectTimer: NodeJS.Timeout = setTimeout(() => {
+					if (!player.isPlaying && player.queue.size === 0) {
 						player.destroy();
-						channel?.send('Been idle for 3 minutes, bandwidth does not grow on trees. Disconnecting, cya!');
+						channel?.send('I have been idle for 3 minutes. Cya 👋.');
+						disconnectTimers.delete(player.guildId);
 					}
-				}, minutesToMilliseconds(3));
+				}, minutesToMilliseconds(3)) as NodeJS.Timeout;
+	
+				disconnectTimers.set(player.guildId, disconnectTimer);
+	
 				const onStatusChange = () => {
-					if (player.isAutoPlay || player.isPlaying) {
+					if (player.isPlaying || player.queue.size > 0) {
 						clearTimeout(disconnectTimer);
+						disconnectTimers.delete(player.guildId);
 						this.poru.off('playerUpdate', onStatusChange);
 					}
 				};
-
+	
 				this.poru.on('playerUpdate', onStatusChange);
 			}
 		});
-
-
+	
 		this.poru.on('nodeDisconnect', (node) => {
-			this.logger.warn(`Node ${node.name} has been disconnected.`)
+			this.logger.warn(`Node ${node.name} has been disconnected.`);
 		});
-
+	
 		this.poru.on('nodeError', (node, error) => {
-			this.logger.warn(`Node ${node.name} just fired an error ${error}.`)
+			this.logger.warn(`Node ${node.name} just fired an error: ${error}`);
 		});
-
+	
 		this.poru.on('trackError', (player, track, error) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
 			console.error(`Track exception for ${track.info.title}: ${error}`);
@@ -129,42 +129,27 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 			);
 			player.destroy();
 		});
-
+	
 		this.poru.on('playerCreate', (player) => {
-			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			// channel?.send('Player successfully connected.');
-			this.logger.info(`A new player was created on ${player.guildId}`)
+			this.logger.info(`A new player was created on ${player.guildId}`);
 		});
-
+	
 		this.poru.on('playerDestroy', (player) => {
-			// const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			// channel?.send('Player successfully connected.');
-			this.logger.info(`A new player was destroyed on ${player.guildId}`)
+			this.logger.info(`A player was destroyed on ${player.guildId}`);
 		});
-
-
+	
 		this.poru.on('playerUpdate', (player) => {
 			this.logger.info(`Player updated in guild: ${player.guildId}`);
 		});
-
-
+	
 		this.poru.on('nodeConnect', (node) => {
 			this.logger.debug(`Node ${node.name} connected successfully.`);
 		});
-
-		this.poru.on('nodeDisconnect', (node, reason) => {
-			this.logger.warn(`Node ${node.name} disconnected. Reason: ${reason}`);
-		});
-
-		this.poru.on('nodeError', (node, error) => {
-			this.logger.error(`Node ${node.name} encountered an error: ${error.message}`);
-		});
-
+	
 		this.poru.on('nodeReconnect', (node) => {
 			this.logger.info(`Node ${node.name} is reconnecting...`);
 		});
 	}
-
 }
 
 declare module 'discord.js' {

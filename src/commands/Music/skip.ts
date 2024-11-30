@@ -26,17 +26,28 @@ export default new Command({
 				});
 			}
 
-			if (player.isAutoPlay) {
+			if (player.queue.length > 0) {
 				player.skip();
-				await player.autoplay()
-			}
-			else {
+			} else if (player.isAutoPlay) {
+				try {
+					await player.autoplay();
+				} catch (error) {
+					console.error('Error during autoplay in skip command:', error);
+					return interaction.reply({
+						content: 'No more tracks available for autoplay.',
+						ephemeral: true,
+					});
+				}
+			} else {
 				player.skip();
+				interaction.reply({
+					content: 'No more tracks in the queue.',
+					ephemeral: true,
+				});
 			}
+
+			await interaction.reply('👍')
 			
-			return interaction.reply({
-				content: '👍',
-			});
 		} catch (error) {
 			console.error('Error in commandRun:', error);
 			return interaction.reply({
@@ -60,9 +71,24 @@ export default new Command({
 				return message.channel.send('There is no active player for this server.');
 			}
 
-			player.skip();
-
-			return message.reply('👍');
+			if (player.queue.length > 0) {
+				player.skip();
+			} else if (player.isAutoPlay) {
+				try {
+					await player.autoplay();
+				} catch (error) {
+					console.error('Error during autoplay in skip command:', error);
+					return message.reply({
+						content: 'No more tracks available for autoplay.',
+		
+					});
+				}
+			} else {
+				player.skip();
+				message.reply({
+					content: 'No more tracks in the queue.',
+				});
+			}
 		} catch (error) {
 			console.error('Error in messageRun:', error);
 			return message.channel.send('An error occurred while processing your request. Please try again later.');

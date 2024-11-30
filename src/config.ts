@@ -17,7 +17,7 @@ const config: ConfigType = {
     },
     bot: {
         owners: [],
-        prefix: ['!']
+        prefix: ['.']
     }
 }
 
@@ -34,7 +34,7 @@ interface Conf {
     options: PoruOptions,
 
     bot: {
-        prefix: ['!'],
+        prefix: ['.'],
         owners: []
     }
 }
