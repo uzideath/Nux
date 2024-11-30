@@ -26,6 +26,10 @@ export default new Command({
                 });
             }
 
+            if(!player.isPlaying){
+                return interaction.reply(`Please play a song before using autoplay.`)
+            }
+
             player.isAutoPlay = !player.isAutoPlay;
             const state = player.isAutoPlay ? 'Enabled' : 'Disabled';
 
@@ -50,6 +54,10 @@ export default new Command({
             const player = message.client.poru.players.get(message.guild!.id);
             if (!player) {
                 return message.channel.send('There is no active player for this server.');
+            }
+
+            if(!player.isPlaying){
+                return message.channel.send(`Please play a song before using autoplay.`)
             }
 
             player.isAutoPlay = !player.isAutoPlay;
