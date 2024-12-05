@@ -62,6 +62,7 @@ export class Command<T extends CommandType = CommandType> {
 
 	public static initialize(client: Client): void {
 		this.redisClient = client.redis;
+		console.log('[Command] Redis client initialized.'); // Add this debug log
 	}
 
 	public static getRedisClient(): Redis {
@@ -104,20 +105,26 @@ export class Command<T extends CommandType = CommandType> {
 	 * @returns True if the user is on cooldown, false otherwise
 	 */
 	public async checkCooldown(userId: string, guildId: string): Promise<boolean> {
+		console.log(`[Cooldown] Checking cooldown for user: ${userId}, guild: ${guildId}`); // Debug log
 		const redis = Command.getRedisClient();
 		const key = `cooldown:${this.name}:${guildId}:${userId}`;
 		const isOnCooldown = await redis.exists(key);
-
+	
 		if (isOnCooldown) {
+			const ttl = await redis.ttl(key);
+			console.log(`[Cooldown] Key exists. Remaining TTL: ${ttl}`); // Debug log
 			return true;
 		}
-
+	
 		if (this.cooldown && this.cooldown > 0) {
+			console.log(`[Cooldown] Setting key: ${key} with expiration: ${this.cooldown}`); // Debug log
 			await redis.set(key, '1', 'EX', this.cooldown);
 		}
-
+	
 		return false;
 	}
+	
+
 
 	/**
 	 * Retrieves the remaining cooldown time for the user.

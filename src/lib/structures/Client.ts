@@ -41,6 +41,23 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		this.poru = new Poru(this, config.nodes, config.options);
 
 		this.redis = new Redis(config.redis.url);
+
+		this.redis.on('error', (err) => {
+			this.logger.error(`[Redis] An error occurred: ${err.message}`);
+		});
+
+		this.redis.on('connect', () => {
+			this.logger.info('[Redis] Connected to the Redis server.');
+		});
+
+		this.redis.on('reconnecting', () => {
+			this.logger.warn('[Redis] Attempting to reconnect to the Redis server.');
+		});
+
+		this.redis.on('end', () => {
+			this.logger.warn('[Redis] Connection to the Redis server has been closed.');
+		});
+
 		Command.initialize(this as Client<true>);
 		this.registerPoruEvents();
 
