@@ -5,7 +5,6 @@ export default new Command({
 	type: CommandType.ChatInput,
 	description: 'Skip to the next song in the queue!',
 	aliases: ['sk'],
-	cooldown: 5,
 	async commandRun(interaction) {
 		try {
 			await interaction.deferReply();

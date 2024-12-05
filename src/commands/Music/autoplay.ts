@@ -5,7 +5,6 @@ export default new Command({
     type: CommandType.ChatInput,
     description: 'Toggle autoplay mode for the music player.',
     aliases: ['ap'],
-    cooldown: 10,
     async commandRun(interaction) {
         try {
             await interaction.deferReply();

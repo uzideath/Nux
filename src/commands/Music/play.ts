@@ -14,7 +14,6 @@ export default new Command({
             required: true,
         },
     ],
-    cooldown: 5,
     async commandRun(interaction) {
         await interaction.deferReply();
         try {

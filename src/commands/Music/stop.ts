@@ -5,7 +5,6 @@ export default new Command({
 	type: CommandType.ChatInput,
 	description: 'Stop the current queue from playing.',
 	aliases: ['s'],
-	cooldown: 5,
 	async commandRun(interaction) {
 		try {
 			await interaction.deferReply();

@@ -5,7 +5,6 @@ export default new Command({
 	type: CommandType.ChatInput,
 	description: 'Shuffle shuffle shuffle!!',
 	aliases: ['sh'],
-	cooldown: 5,
 	async commandRun(interaction) {
 		try {
 			await interaction.deferReply();

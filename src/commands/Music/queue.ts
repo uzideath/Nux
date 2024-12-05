@@ -6,7 +6,6 @@ export default new Command({
     type: CommandType.ChatInput,
     description: 'Displays the current queue of songs with pagination.',
     aliases: ['q'],
-    cooldown: 10,
     async commandRun(interaction) {
         try {
             await interaction.deferReply();

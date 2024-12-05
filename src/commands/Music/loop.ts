@@ -4,7 +4,6 @@ import { Command } from '#lib/structures';
 export default new Command({
     type: CommandType.ChatInput,
     description: 'Loop the queue!',
-    cooldown: 10,
     async commandRun(interaction) {
         try {
             await interaction.deferReply();
