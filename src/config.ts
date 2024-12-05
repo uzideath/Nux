@@ -17,6 +17,9 @@ const config: ConfigType = {
         owners: [],
         prefix: process.env.PREFIX ? process.env.PREFIX.split(",") : ['.'],
     },
+    redis: {
+        url: process.env.REDIS_URL || "redis://localhost:6379",
+    },
 };
 
 interface Conf {
@@ -32,6 +35,9 @@ interface Conf {
     bot: {
         prefix: string[];
         owners: [];
+    };
+    redis: {
+        url: string; // Redis connection URL
     };
 }
 

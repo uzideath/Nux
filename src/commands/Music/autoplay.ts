@@ -5,40 +5,39 @@ export default new Command({
     type: CommandType.ChatInput,
     description: 'Toggle autoplay mode for the music player.',
     aliases: ['ap'],
-
+    cooldown: 10,
     async commandRun(interaction) {
         try {
+            await interaction.deferReply();
+
             const member = await interaction.guild?.members.fetch(interaction.user.id);
             const voiceChannel = member?.voice.channel;
 
             if (!voiceChannel) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'You need to be in a voice channel to use this command.',
-                    ephemeral: true,
                 });
             }
 
             const player = interaction.client.poru.players.get(interaction.guild!.id);
             if (!player) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'There is no active player for this server.',
-                    ephemeral: true,
                 });
             }
 
-            if(!player.isPlaying){
-                return interaction.reply(`Please play a song before using autoplay.`)
+            if (!player.isPlaying) {
+                return interaction.followUp('Please play a song before using autoplay.');
             }
 
             player.isAutoPlay = !player.isAutoPlay;
             const state = player.isAutoPlay ? 'Enabled' : 'Disabled';
 
-            return interaction.reply(`<a:DancingChristmasPepe:1311733132285837373> **${state}**.`);
+            return interaction.followUp(`<a:DancingChristmasPepe:1311733132285837373> **${state}**.`);
         } catch (error) {
             console.error('Error in commandRun:', error);
-            return interaction.reply({
+            return interaction.followUp({
                 content: 'An error occurred while executing the command. Please try again later.',
-                ephemeral: true,
             });
         }
     },
@@ -56,8 +55,8 @@ export default new Command({
                 return message.channel.send('There is no active player for this server.');
             }
 
-            if(!player.isPlaying){
-                return message.channel.send(`Please play a song before using autoplay.`)
+            if (!player.isPlaying) {
+                return message.channel.send('Please play a song before using autoplay.');
             }
 
             player.isAutoPlay = !player.isAutoPlay;

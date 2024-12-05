@@ -4,35 +4,34 @@ import { Command } from '#lib/structures';
 export default new Command({
     type: CommandType.ChatInput,
     description: 'Loop the queue!',
-
+    cooldown: 10,
     async commandRun(interaction) {
         try {
+            await interaction.deferReply();
+
             const member = await interaction.guild?.members.fetch(interaction.user.id);
             const voiceChannel = member?.voice.channel?.id;
 
             if (!voiceChannel) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'You need to be in a voice channel to use this command.',
-                    ephemeral: true,
                 });
             }
 
             const player = interaction.client.poru.players.get(interaction.guild!.id);
 
             if (!player) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'No active player found for this server.',
-                    ephemeral: true,
                 });
             }
 
             player.setLoop('QUEUE');
-            return await interaction.reply('👍');
+            return interaction.followUp('👍');
         } catch (error) {
             console.error('Error executing commandRun:', error);
-            return interaction.reply({
+            return interaction.followUp({
                 content: 'An error occurred while processing the command. Please try again later.',
-                ephemeral: true,
             });
         }
     },

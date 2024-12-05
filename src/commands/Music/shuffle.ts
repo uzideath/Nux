@@ -5,33 +5,33 @@ export default new Command({
 	type: CommandType.ChatInput,
 	description: 'Shuffle shuffle shuffle!!',
 	aliases: ['sh'],
+	cooldown: 5,
 	async commandRun(interaction) {
 		try {
+			await interaction.deferReply();
+
 			const member = await interaction.guild?.members.fetch(interaction.user.id);
 			const voiceChannel = member?.voice.channel;
 
 			if (!voiceChannel) {
-				return interaction.reply({
+				return interaction.followUp({
 					content: 'You need to be in a voice channel to use this command.',
-					ephemeral: true,
 				});
 			}
 
 			const player = interaction.client.poru.players.get(interaction.guild!.id);
 			if (!player) {
-				return interaction.reply({
+				return interaction.followUp({
 					content: 'There is no active player for this server.',
-					ephemeral: true,
 				});
 			}
 
 			player.queue.shuffle();
-			return await interaction.reply('<a:spin:1311752742686953534>');
+			return interaction.followUp('<a:spin:1311752742686953534>');
 		} catch (error) {
 			console.error('Error in commandRun:', error);
-			return interaction.reply({
+			return interaction.followUp({
 				content: 'An error occurred while executing the command. Please try again later.',
-				ephemeral: true,
 			});
 		}
 	},

@@ -6,16 +6,17 @@ export default new Command({
     type: CommandType.ChatInput,
     description: 'Displays the current queue of songs with pagination.',
     aliases: ['q'],
-
+    cooldown: 10,
     async commandRun(interaction) {
         try {
+            await interaction.deferReply();
+
             const member = await interaction.guild?.members.fetch(interaction.user.id);
             const voiceChannel = member?.voice.channel?.id;
 
             if (!voiceChannel) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'You need to be in a voice channel to use this command.',
-                    ephemeral: true,
                 });
             }
 
@@ -24,9 +25,8 @@ export default new Command({
 
             const player = poru.players.get(interaction.guild!.id);
             if (!player) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'There is no active player in this server.',
-                    ephemeral: true,
                 });
             }
 
@@ -34,9 +34,8 @@ export default new Command({
             const queueTracks = player.queue;
 
             if (!currentTrack && !queueTracks.length) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'The queue is currently empty.',
-                    ephemeral: true,
                 });
             }
 
@@ -63,19 +62,17 @@ export default new Command({
             }
 
             if (pages.length === 0) {
-                return interaction.reply({
+                return interaction.followUp({
                     content: 'There are no songs in the queue to display.',
-                    ephemeral: true,
                 });
             }
 
-            const paginator = new Paginator({ embeds: pages, ephemeral: false });
+            const paginator = new Paginator({ embeds: pages });
             return paginator.run(interaction);
         } catch (error) {
             console.error('Error in commandRun:', error);
-            return interaction.reply({
+            return interaction.followUp({
                 content: 'An error occurred while processing the command. Please try again later.',
-                ephemeral: true,
             });
         }
     },

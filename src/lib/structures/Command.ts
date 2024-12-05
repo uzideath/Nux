@@ -1,3 +1,4 @@
+import { Redis } from 'ioredis';
 import { CommandType } from '#lib/enums';
 import { AddUndefinedToPossiblyUndefinedPropertiesOfInterface } from 'discord-api-types/utils/internals';
 import {
@@ -13,6 +14,7 @@ import {
 	ApplicationCommandType,
 	Awaitable,
 } from 'discord.js';
+import { Client } from './Client';
 
 export class Command<T extends CommandType = CommandType> {
 	private data: CommandOptions<T>;
@@ -24,6 +26,7 @@ export class Command<T extends CommandType = CommandType> {
 	public runInDM?: boolean;
 	public aliases?: string[];
 	public ownerOnly?: boolean;
+	public cooldown?: number;
 	public commandRun?: (interaction: RunType[T]) => Awaitable<unknown>;
 	public messageRun?: (
 		message: Message<boolean>,
@@ -32,6 +35,8 @@ export class Command<T extends CommandType = CommandType> {
 	public autoCompleteRun?: (
 		interaction: AutocompleteInteraction
 	) => Awaitable<unknown>;
+
+	private static redisClient: Redis;
 
 	public constructor(data: CommandOptions<T>) {
 		this.data = data;
@@ -45,6 +50,7 @@ export class Command<T extends CommandType = CommandType> {
 		this.permissions = data.defaultMemberPermissions ?? null;
 		this.runInDM = data.dmPermission;
 		this.ownerOnly = data.ownerOnly;
+		this.cooldown = data.cooldown ?? 0;
 
 		if (data.type === CommandType.ChatInput) {
 			this.description = (data as ChatInputCommandOptions).description;
@@ -52,6 +58,17 @@ export class Command<T extends CommandType = CommandType> {
 		}
 
 		this.guildIds = this.data.guildIds ?? []; // Keep it empty for global commands
+	}
+
+	public static initialize(client: Client): void {
+		this.redisClient = client.redis;
+	}
+
+	public static getRedisClient(): Redis {
+		if (!this.redisClient) {
+			throw new Error('Redis client is not set. Use Command.initialize(client) to set it.');
+		}
+		return this.redisClient;
 	}
 
 	public set name(name: string) {
@@ -71,13 +88,48 @@ export class Command<T extends CommandType = CommandType> {
 			dm_permission: this.runInDM,
 			options: this
 				.options as AddUndefinedToPossiblyUndefinedPropertiesOfInterface<
-				APIApplicationCommandOption[]
-			>,
+					APIApplicationCommandOption[]
+				>,
 			type: this
 				.type as unknown as AddUndefinedToPossiblyUndefinedPropertiesOfInterface<
-				ApplicationCommandType.ChatInput | undefined
-			>,
+					ApplicationCommandType.ChatInput | undefined
+				>,
 		};
+	}
+
+	/**
+	 * Checks if the user is on cooldown and sets it if not.
+	 * @param userId User ID
+	 * @param guildId Guild ID
+	 * @returns True if the user is on cooldown, false otherwise
+	 */
+	public async checkCooldown(userId: string, guildId: string): Promise<boolean> {
+		const redis = Command.getRedisClient();
+		const key = `cooldown:${this.name}:${guildId}:${userId}`;
+		const isOnCooldown = await redis.exists(key);
+
+		if (isOnCooldown) {
+			return true;
+		}
+
+		if (this.cooldown && this.cooldown > 0) {
+			await redis.set(key, '1', 'EX', this.cooldown);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Retrieves the remaining cooldown time for the user.
+	 * @param userId User ID
+	 * @param guildId Guild ID
+	 * @returns Remaining time in seconds
+	 */
+	public async getCooldown(userId: string, guildId: string): Promise<number> {
+		const redis = Command.getRedisClient();
+		const key = `cooldown:${this.name}:${guildId}:${userId}`;
+		const ttl = await redis.ttl(key);
+		return ttl > 0 ? ttl : 0;
 	}
 }
 
@@ -86,13 +138,14 @@ interface BaseCommandOptions<T extends CommandType> {
 	name?: string;
 	aliases?: string[];
 	description?: string;
+	cooldown?: number;
 	defaultMemberPermissions?: PermissionResolvable;
 	ownerOnly?: boolean;
 	commandRun?: (interaction: RunType[T]) => Awaitable<unknown>;
 	messageRun?: (message: Message<boolean>, args: string[]) => Awaitable<unknown>;
 	autoCompleteRun?: T extends CommandType.ChatInput
-		? (interaction: AutocompleteInteraction) => Awaitable<unknown>
-		: never;
+	? (interaction: AutocompleteInteraction) => Awaitable<unknown>
+	: never;
 }
 
 interface ChatInputCommandOptions
@@ -116,11 +169,11 @@ type CommandOptions<T extends CommandType> = T extends CommandType.ChatInput
 	? ChatInputCommandOptions & BaseCommand
 	: T extends CommandType.Legacy
 	? BaseCommandOptions<T> &
-			Required<Pick<BaseCommandOptions<T>, 'messageRun'>> &
-			BaseCommand
+	Required<Pick<BaseCommandOptions<T>, 'messageRun'>> &
+	BaseCommand
 	: BaseCommandOptions<T> &
-			Required<Pick<BaseCommandOptions<T>, 'commandRun'>> &
-			BaseCommand;
+	Required<Pick<BaseCommandOptions<T>, 'commandRun'>> &
+	BaseCommand;
 
 type BaseCommand = GuildCommand | GlobalCommand;
 

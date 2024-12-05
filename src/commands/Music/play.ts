@@ -14,12 +14,12 @@ export default new Command({
             required: true,
         },
     ],
+    cooldown: 5,
     async commandRun(interaction) {
+        await interaction.deferReply();
         try {
             const member = await interaction.guild?.members.fetch(interaction.user.id);
             const userVoiceChannel = member?.voice.channel?.id;
-
-            await interaction.deferReply();
 
             if (!userVoiceChannel) {
                 return interaction.editReply({
