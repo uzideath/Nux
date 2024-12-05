@@ -18,7 +18,9 @@ const config: ConfigType = {
         prefix: process.env.PREFIX ? process.env.PREFIX.split(",") : ['.'],
     },
     redis: {
-        url: process.env.REDIS_URL || "redis://localhost:6379",
+        host: process.env.REDIS_HOST || "localhost",
+        port: Number(process.env.REDIS_PORT) || 6379,
+        password: process.env.REDIS_PASSWORD || "",
     },
 };
 
@@ -37,7 +39,9 @@ interface Conf {
         owners: [];
     };
     redis: {
-        url: string; // Redis connection URL
+        host: string;      // Redis host
+        port: number;      // Redis port
+        password: string;  // Redis password
     };
 }
 

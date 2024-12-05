@@ -40,7 +40,11 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 
 		this.poru = new Poru(this, config.nodes, config.options);
 
-		this.redis = new Redis(config.redis.url);
+		this.redis = new Redis({
+			host: config.redis.host,
+			port: config.redis.port,
+			password: config.redis.password
+		});
 
 		this.redis.on('error', (err) => {
 			this.logger.error(`[Redis] An error occurred: ${err.message}`);
