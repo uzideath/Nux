@@ -2,8 +2,7 @@ import { Message, User } from 'discord.js';
 
 export class Prompt {
 	public constructor(public readonly options: PromptOptions) {
-		if (this.options.questions.length === 0)
-			throw new Error('No valid questions to prompt!');
+		if (this.options.questions.length === 0) throw new Error('No valid questions to prompt!');
 
 		this.options.time ??= 60_000;
 	}
@@ -32,9 +31,7 @@ export class Prompt {
 				if (autoDelete) await m.delete();
 				const next = rest.shift();
 				next
-					? await m.channel.send(
-							typeof next === 'string' ? next : next.question
-					  )
+					? await m.channel.send(typeof next === 'string' ? next : next.question)
 					: collector.stop('Collected All Answers');
 				collector.resetTimer({
 					time: typeof next !== 'string' ? next?.time : undefined,

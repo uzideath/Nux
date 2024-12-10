@@ -125,7 +125,9 @@ export default new Command({
 
 			const botPermissions = voiceChannel.permissionsFor(message.guild?.members.me!);
 			if (!botPermissions?.has(PermissionFlagsBits.Connect) || !botPermissions?.has(PermissionFlagsBits.Speak)) {
-				return message.channel.send('I do not have the necessary permissions to join and play in your voice channel.');
+				return message.channel.send(
+					'I do not have the necessary permissions to join and play in your voice channel.',
+				);
 			}
 
 			const poru = message.client.poru;

@@ -19,9 +19,7 @@ import {
 export class Paginator {
 	private currentCount: number = 0;
 	private selectMenuOptions?: RestOrArray<
-		| SelectMenuOptionBuilder
-		| APISelectMenuOption
-		| SelectMenuComponentOptionData
+		SelectMenuOptionBuilder | APISelectMenuOption | SelectMenuComponentOptionData
 	>;
 	private descriptions?: string[];
 
@@ -34,7 +32,7 @@ export class Paginator {
 		this.options.embeds &&= this.options.embeds.map((embed, i) =>
 			new EmbedBuilder(embed.data).setFooter({
 				text: `Page ${i + 1}/${this.options.embeds!.length}`,
-			})
+			}),
 		);
 
 		if (this.pages > 25) this.options.includeSelectMenu = false;
@@ -56,48 +54,31 @@ export class Paginator {
 	}
 
 	public setSelectMenuOptions(
-		...options: RestOrArray<
-			| SelectMenuOptionBuilder
-			| APISelectMenuOption
-			| SelectMenuComponentOptionData
-		>
+		...options: RestOrArray<SelectMenuOptionBuilder | APISelectMenuOption | SelectMenuComponentOptionData>
 	): this {
 		this.selectMenuOptions = options;
 		return this;
 	}
 
-	public async run(
-		messageOrInteraction: Message | CommandInteraction,
-		user?: User
-	) {
+	public async run(messageOrInteraction: Message | CommandInteraction, user?: User) {
 		this.sanityChecks();
 
 		const target = user
 			? user
 			: messageOrInteraction instanceof Message
-			? messageOrInteraction.author
-			: messageOrInteraction.user;
+				? messageOrInteraction.author
+				: messageOrInteraction.user;
 
 		const embeds = this.options.embeds ?? this.buildEmbeds()!;
 
-		const rows = Boolean(this.buildSelect())
-			? [this.buildButtons(), this.buildSelect()!]
-			: [this.buildButtons()];
+		const rows = Boolean(this.buildSelect()) ? [this.buildButtons(), this.buildSelect()!] : [this.buildButtons()];
 
 		if (messageOrInteraction instanceof Message) {
-			const message = await this.handleMessage(
-				messageOrInteraction,
-				embeds,
-				rows
-			);
+			const message = await this.handleMessage(messageOrInteraction, embeds, rows);
 
 			return this.handleCollector(message, target);
 		} else {
-			const message = await this.handleInteraction(
-				messageOrInteraction,
-				embeds,
-				rows
-			);
+			const message = await this.handleInteraction(messageOrInteraction, embeds, rows);
 			return this.handleCollector(message, target);
 		}
 	}
@@ -105,10 +86,7 @@ export class Paginator {
 	private async handleMessage(
 		message: Message,
 		embeds: EmbedBuilder[],
-		rows: (
-			| ActionRowBuilder<StringSelectMenuBuilder>
-			| ActionRowBuilder<ButtonBuilder>
-		)[]
+		rows: (ActionRowBuilder<StringSelectMenuBuilder> | ActionRowBuilder<ButtonBuilder>)[],
 	) {
 		const msg = await message.channel.send({
 			embeds: [embeds![this.currentCount]],
@@ -120,10 +98,7 @@ export class Paginator {
 	private async handleInteraction(
 		interaction: CommandInteraction,
 		embeds: EmbedBuilder[],
-		rows: (
-			| ActionRowBuilder<StringSelectMenuBuilder>
-			| ActionRowBuilder<ButtonBuilder>
-		)[]
+		rows: (ActionRowBuilder<StringSelectMenuBuilder> | ActionRowBuilder<ButtonBuilder>)[],
 	) {
 		let msg: Message<boolean>;
 		if (interaction.replied || interaction.deferred) {
@@ -227,7 +202,7 @@ export class Paginator {
 				.setDisabled(
 					embeds.length === 1 ||
 						((i === 0 || i === 1) && first === this.currentCount) ||
-						((i === 3 || i === 4) && last === this.currentCount)
+						((i === 3 || i === 4) && last === this.currentCount),
 				)
 				.setStyle(ButtonStyle.Secondary);
 			buttons.push(button);
@@ -252,7 +227,7 @@ export class Paginator {
 							label: `Page ${i + 1}`,
 							value: `${i}`,
 							default: i === this.currentCount,
-						})))
+						}))),
 			);
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(select);
 		return row;
@@ -277,9 +252,7 @@ export class Paginator {
 	}
 
 	private updateSelect(components: ActionRow<MessageActionRowComponent>[]) {
-		const selectMenuOption = (
-			components[1].components[0].data as APIStringSelectComponent
-		).options;
+		const selectMenuOption = (components[1].components[0].data as APIStringSelectComponent).options;
 		for (const option of selectMenuOption) {
 			if (option.value === `${this.currentCount}`) option.default = true;
 			else option.default = false;
@@ -319,9 +292,4 @@ interface PaginatorOptions {
 	ephemeral?: boolean;
 }
 
-type ButtonIds =
-	| '@paginator/first'
-	| '@paginator/back'
-	| '@paginator/stop'
-	| '@paginator/forward'
-	| '@paginator/last';
+type ButtonIds = '@paginator/first' | '@paginator/back' | '@paginator/stop' | '@paginator/forward' | '@paginator/last';

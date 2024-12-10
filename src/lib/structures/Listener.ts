@@ -33,5 +33,5 @@ interface ListenerOptions<T> {
 type EventArgs<T> = T extends keyof ClientEvents
 	? [...args: ClientEvents[T], client: Client<true>]
 	: T extends keyof PoruEvents
-	? [...args: Parameters<PoruEvents[T]>, client: Client<true>]
-	: unknown[];
+		? [...args: Parameters<PoruEvents[T]>, client: Client<true>]
+		: unknown[];

@@ -21,26 +21,19 @@ export class Logger {
 	public getLevel(): LogLevel {
 		return this.level;
 	}
-	protected log(
-		level: LogLevel,
-		type: LogLevelString,
-		color: Color,
-		message: string,
-		...args: unknown[]
-	): void {
+	protected log(level: LogLevel, type: LogLevelString, color: Color, message: string, ...args: unknown[]): void {
 		if (level > this.level) return;
 		const messages = message.split(/\n/);
-		if (messages.length > 1)
-			return messages.forEach((r) => this.log(level, type, color, r));
+		if (messages.length > 1) return messages.forEach((r) => this.log(level, type, color, r));
 
 		console[type](
 			`[${color(
 				type
 					.toUpperCase()
 					.padStart(type.length + (7 - type.length) / 2)
-					.padEnd(7)
+					.padEnd(7),
 			)}] - ${this.format(message, type)}`,
-			...args
+			...args,
 		);
 	}
 	public info(message: string, ...args: unknown[]): void {
@@ -59,9 +52,7 @@ export class Logger {
 
 	private format(message: string, type: LogLevelString) {
 		let words = message.split(' ');
-		words = words.map((w) =>
-			!isNaN(Number(w)) || w.match(/\d+m?s/gm) ? blueBright(w) : w
-		);
+		words = words.map((w) => (!isNaN(Number(w)) || w.match(/\d+m?s/gm) ? blueBright(w) : w));
 		message = words.join(' ');
 		message = message.replace(/\[.+ => \w+\s?\d?\]/, cyan);
 		return type === 'debug' ? gray(message) : whiteBright(message);

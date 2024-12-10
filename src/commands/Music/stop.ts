@@ -13,9 +13,8 @@ export default new Command({
 			const voiceChannel = member?.voice.channel?.id;
 
 			if (!voiceChannel) {
-				return interaction.followUp({
+				return interaction.editReply({
 					content: 'You need to be in a voice channel to use this command.',
-					ephemeral: true,
 				});
 			}
 
@@ -24,9 +23,8 @@ export default new Command({
 			const player = poru.players.get(interaction.guild!.id);
 
 			if (!player) {
-				return interaction.followUp({
+				return interaction.editReply({
 					content: 'There is no active player for this server.',
-					ephemeral: true,
 				});
 			}
 
@@ -36,14 +34,13 @@ export default new Command({
 
 			player.destroy();
 
-			return interaction.followUp({
+			return interaction.editReply({
 				content: '<a:pepehi:1311716419620044930>',
 			});
 		} catch (error) {
 			console.error('Error in commandRun:', error);
-			return interaction.followUp({
+			return interaction.editReply({
 				content: 'An error occurred while processing the command. Please try again later.',
-				ephemeral: true,
 			});
 		}
 	},

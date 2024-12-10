@@ -9,12 +9,13 @@ After that, we will compile our TypeScript code to JavaScript
 ```bash
 bun install
 ```
+
 ### Setting token
 
 1. Rename `.env.example` to `.env`
 2. Add your token to the `.env` file in this format
 3. Fill the required information.
-   
+
 ### Starting the bot
 
 Now we can start the bot using `bun run dev` script.
@@ -22,6 +23,7 @@ Now we can start the bot using `bun run dev` script.
 ```bash
 bun run dev
 ```
+
 ## Production Setup
 
 To run in production environment, we use Docker. You can read more about it [here](https://docs.docker.com/get-started/).
@@ -31,6 +33,7 @@ To run in production environment, we use Docker. You can read more about it [her
 ```bash
 docker build -t aurora-project .
 ```
+
 ### Running the image
 
 ```bash

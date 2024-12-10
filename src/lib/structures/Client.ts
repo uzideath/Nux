@@ -69,7 +69,9 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 
 		this.poru.on('trackStart', (player, track) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
-			channel?.send(`Now playing \`${track.info.title}\``);
+			channel?.send(`Now playing \`${track.info.title}\``).catch(() => {
+				this.logger.error(`Failed to send trackStart message to channel ${channel?.id}`);
+			});
 
 			if (disconnectTimers.has(player.guildId)) {
 				clearTimeout(disconnectTimers.get(player.guildId)!);
@@ -85,7 +87,9 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 					await player.autoplay();
 				} catch (error) {
 					console.error('Error during autoplay:', error);
-					channel?.send('An error occurred while attempting to autoplay. Stopping autoplay.');
+					channel?.send('An error occurred while attempting to autoplay. Stopping autoplay.').catch(() => {
+						this.logger.error(`Failed to send autoplay message to channel ${channel?.id}`);
+					});
 				}
 				return;
 			}
@@ -94,7 +98,9 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 				const disconnectTimer: NodeJS.Timeout = setTimeout(() => {
 					if (!player.isPlaying && player.queue.size === 0) {
 						player.destroy();
-						channel?.send('I have been idle for 3 minutes. Cya 👋.');
+						channel?.send('I have been idle for 3 minutes. Cya 👋').catch(() => {
+							this.logger.error(`Failed to send queueEnd idle message to channel ${channel?.id}`);
+						});
 						disconnectTimers.delete(player.guildId);
 					}
 				}, minutesToMilliseconds(3)) as NodeJS.Timeout;
@@ -124,7 +130,11 @@ export class Client<Ready extends boolean = true> extends DJSClient<Ready> {
 		this.poru.on('trackError', (player, track, error) => {
 			const channel = this.channels.cache.get(player.textChannel) as TextChannel;
 			console.error(`Track exception for ${track.info.title}: ${error}`);
-			channel?.send(`An error occurred while playing \`${track.info.title}\`: ${error}. Skipping...`);
+			channel
+				?.send(`An error occurred while playing \`${track.info.title}\`: ${error}. Skipping...`)
+				.catch(() => {
+					this.logger.error(`Failed to send trackError message to channel ${channel?.id}`);
+				});
 			player.destroy();
 		});
 

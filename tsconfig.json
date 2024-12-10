@@ -11,7 +11,7 @@
 			"#root/*": ["*"]
 		},
 		"rootDir": ".",
-    "outDir": "dist",
+		"outDir": "dist",
 		"allowJs": true,
 		"noEmit": true,
 		"strict": true,

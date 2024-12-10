@@ -4,6 +4,6 @@ declare module 'bun' {
 		TEST_SERVER_ID: string;
 		LAVALINK_HOST: string;
 		LAVALINK_PORT: number;
-		LAVALINK_PASSWORD: string
+		LAVALINK_PASSWORD: string;
 	}
 }

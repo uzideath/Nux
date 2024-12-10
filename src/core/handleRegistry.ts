@@ -24,7 +24,9 @@ export async function initiateCommands(client: Client, registryOptions: Registry
 export async function handleRegistry(client: Client) {
 	const commandFolders = readdirSync(`${process.cwd()}/src/commands`);
 	for (const folder of commandFolders) {
-		const commandsFiles = readdirSync(`${process.cwd()}/src/commands/${folder}`).filter((file) => file.endsWith('.ts'));
+		const commandsFiles = readdirSync(`${process.cwd()}/src/commands/${folder}`).filter((file) =>
+			file.endsWith('.ts'),
+		);
 
 		for (const file of commandsFiles) {
 			const path = `../commands/${folder}/${file}`;

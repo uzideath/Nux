@@ -1,12 +1,5 @@
 import type { Snowflake } from 'discord-api-types/v10';
-import {
-	Collection,
-	CommandInteraction,
-	GuildBasedChannel,
-	GuildMember,
-	Role,
-	User,
-} from 'discord.js';
+import { Collection, CommandInteraction, GuildBasedChannel, GuildMember, Role, User } from 'discord.js';
 
 /**
  * It resolves mentions from the content of a command
@@ -19,7 +12,7 @@ import {
 export class Resolver {
 	public constructor(
 		private readonly content: string,
-		private readonly interaction: CommandInteraction
+		private readonly interaction: CommandInteraction,
 	) {}
 
 	readonly #regex = {

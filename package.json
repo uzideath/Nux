@@ -1,26 +1,33 @@
 {
-  "name": "aurora-project",
-  "type": "module",
-  "imports": {
-    "#lib/*": "./src/lib/*/index.ts",
-    "#core": "./src/core/index.ts",
-    "#root/*": "./src/*.ts"
-  },
-  "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "start": "bun run src/index.ts"
-  },
-  "dependencies": {
-    "colorette": "2.0.20",
-    "discord-api-types": "0.37.97",
-    "discord.js": "14.15.3",
-    "ioredis": "^5.4.1",
-    "poru": "^5.2.0"
-  },
-  "devDependencies": {
-    "@types/bun": "1.1.8",
-    "@types/node": "22.5.0",
-    "prettier": "3.3.3",
-    "typescript": "5.5.4"
-  }
+	"name": "aurora-project",
+	"type": "module",
+	"imports": {
+		"#lib/*": "./src/lib/*/index.ts",
+		"#core": "./src/core/index.ts",
+		"#root/*": "./src/*.ts"
+	},
+	"scripts": {
+		"lint": "eslint \"{src,apps,libs,test,prisma}/**/*.ts\" --fix",
+		"format": "prettier --write .",
+		"dev": "bun run --watch src/index.ts",
+		"start": "bun run src/index.ts"
+	},
+	"dependencies": {
+		"colorette": "2.0.20",
+		"discord-api-types": "0.37.97",
+		"discord.js": "14.15.3",
+		"ioredis": "^5.4.1",
+		"poru": "^5.2.0"
+	},
+	"devDependencies": {
+		"@types/bun": "1.1.8",
+		"@types/node": "22.5.0",
+		"@typescript-eslint/eslint-plugin": "^8.18.0",
+		"@typescript-eslint/parser": "^8.18.0",
+		"eslint": "^9.16.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.2.1",
+		"prettier": "^3.3.3",
+		"typescript": "5.5.4"
+	}
 }

@@ -25,21 +25,14 @@ export class Command<T extends CommandType = CommandType> {
 	public aliases?: string[];
 	public ownerOnly?: boolean;
 	public commandRun?: (interaction: RunType[T]) => Awaitable<unknown>;
-	public messageRun?: (
-		message: Message<boolean>,
-		args: string[]
-	) => Awaitable<unknown>;
-	public autoCompleteRun?: (
-		interaction: AutocompleteInteraction
-	) => Awaitable<unknown>;
+	public messageRun?: (message: Message<boolean>, args: string[]) => Awaitable<unknown>;
+	public autoCompleteRun?: (interaction: AutocompleteInteraction) => Awaitable<unknown>;
 
 	public constructor(data: CommandOptions<T>) {
 		this.data = data;
 		this.type = data.type;
 		this.aliases = data.aliases ?? [];
-		this.commandRun = data.commandRun as
-			| ((interaction: RunType[T]) => Promise<unknown>)
-			| undefined;
+		this.commandRun = data.commandRun as ((interaction: RunType[T]) => Promise<unknown>) | undefined;
 		this.messageRun = data.messageRun;
 		this.autoCompleteRun = data.autoCompleteRun;
 		this.permissions = data.defaultMemberPermissions ?? null;
@@ -69,12 +62,10 @@ export class Command<T extends CommandType = CommandType> {
 			description: this.description ?? '',
 			default_member_permissions: this.permissions?.toString(),
 			dm_permission: this.runInDM,
-			options: this
-				.options as AddUndefinedToPossiblyUndefinedPropertiesOfInterface<
+			options: this.options as AddUndefinedToPossiblyUndefinedPropertiesOfInterface<
 				APIApplicationCommandOption[]
 			>,
-			type: this
-				.type as unknown as AddUndefinedToPossiblyUndefinedPropertiesOfInterface<
+			type: this.type as unknown as AddUndefinedToPossiblyUndefinedPropertiesOfInterface<
 				ApplicationCommandType.ChatInput | undefined
 			>,
 		};
@@ -95,8 +86,7 @@ interface BaseCommandOptions<T extends CommandType> {
 		: never;
 }
 
-interface ChatInputCommandOptions
-	extends BaseCommandOptions<CommandType.ChatInput> {
+interface ChatInputCommandOptions extends BaseCommandOptions<CommandType.ChatInput> {
 	description: string;
 	options?: ApplicationCommandOptionData[];
 	type: CommandType.ChatInput;
@@ -115,12 +105,8 @@ interface GuildCommand {
 type CommandOptions<T extends CommandType> = T extends CommandType.ChatInput
 	? ChatInputCommandOptions & BaseCommand
 	: T extends CommandType.Legacy
-	? BaseCommandOptions<T> &
-			Required<Pick<BaseCommandOptions<T>, 'messageRun'>> &
-			BaseCommand
-	: BaseCommandOptions<T> &
-			Required<Pick<BaseCommandOptions<T>, 'commandRun'>> &
-			BaseCommand;
+		? BaseCommandOptions<T> & Required<Pick<BaseCommandOptions<T>, 'messageRun'>> & BaseCommand
+		: BaseCommandOptions<T> & Required<Pick<BaseCommandOptions<T>, 'commandRun'>> & BaseCommand;
 
 type BaseCommand = GuildCommand | GlobalCommand;
 
